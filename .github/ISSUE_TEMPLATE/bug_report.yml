@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a problem in the skill, documentation, or repository workflow
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a report.
+
+        Please keep examples generic and avoid posting secrets, personal data, private URLs, or internal references.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is the problem?
+      placeholder: A clear and concise summary of the issue
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: How can someone reproduce the issue?
+      placeholder: |
+        1. Go to ...
+        2. Read or apply ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add anything else that helps explain the issue
+    validations:
+      required: false
