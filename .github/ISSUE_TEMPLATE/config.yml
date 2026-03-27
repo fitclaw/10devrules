@@ -1,1 +1,5 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Discussions
+    url: https://github.com/fitclaw/10devrules/discussions
+    about: Share ideas, ask questions, or discuss the 10 rules methodology

@@ -1,4 +1,4 @@
-name: Docs Check
+name: Docs & Skill Check
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Verify required files
+      - name: Verify required files exist
         run: |
           required_files=(
             README.md
@@ -21,16 +21,77 @@ jobs:
             CONTRIBUTING.md
             SECURITY.md
             CODE_OF_CONDUCT.md
+            bin/check-boundary.sh
           )
 
           for file in "${required_files[@]}"; do
             if [ ! -f "$file" ]; then
-              echo "Missing required file: $file"
+              echo "::error::Missing required file: $file"
               exit 1
             fi
           done
+          echo "All required files present."
 
       - name: Verify README titles
         run: |
           grep -q "^# Ten Development Rules" README.md
           grep -q "^# Ten Development Rules" README.zh-CN.md
+
+      - name: Verify SKILL.md frontmatter
+        run: |
+          # Check YAML frontmatter exists and has required fields
+          head -1 SKILL.md | grep -q "^---$" || { echo "::error::SKILL.md missing YAML frontmatter"; exit 1; }
+          grep -q "^name:" SKILL.md || { echo "::error::SKILL.md missing 'name' field"; exit 1; }
+          grep -q "^version:" SKILL.md || { echo "::error::SKILL.md missing 'version' field"; exit 1; }
+          grep -q "^description:" SKILL.md || { echo "::error::SKILL.md missing 'description' field"; exit 1; }
+          grep -q "^allowed-tools:" SKILL.md || { echo "::error::SKILL.md missing 'allowed-tools' field"; exit 1; }
+          echo "SKILL.md frontmatter valid."
+
+      - name: Verify hook script is executable
+        run: |
+          if [ ! -x "bin/check-boundary.sh" ]; then
+            echo "::error::bin/check-boundary.sh is not executable"
+            exit 1
+          fi
+          echo "Hook script is executable."
+
+      - name: Test hook script — no boundary file
+        run: |
+          result=$(echo '{"tool_input":{"file_path":"any/file.py"}}' | bash bin/check-boundary.sh)
+          if [ "$result" != "{}" ]; then
+            echo "::error::Hook should allow when no boundary file exists. Got: $result"
+            exit 1
+          fi
+          echo "No-boundary test passed."
+
+      - name: Test hook script — inside boundary
+        run: |
+          mkdir -p .10dev
+          echo "$(pwd)/src" > .10dev/boundary.txt
+          mkdir -p src
+          result=$(echo "{\"tool_input\":{\"file_path\":\"$(pwd)/src/main.py\"}}" | bash bin/check-boundary.sh)
+          rm -rf .10dev
+          if [ "$result" != "{}" ]; then
+            echo "::error::Hook should allow files inside boundary. Got: $result"
+            exit 1
+          fi
+          echo "Inside-boundary test passed."
+
+      - name: Test hook script — outside boundary
+        run: |
+          mkdir -p .10dev
+          echo "$(pwd)/src" > .10dev/boundary.txt
+          result=$(echo "{\"tool_input\":{\"file_path\":\"$(pwd)/docs/readme.md\"}}" | bash bin/check-boundary.sh)
+          rm -rf .10dev
+          echo "$result" | grep -q "permissionDecision" || {
+            echo "::error::Hook should warn for files outside boundary. Got: $result"
+            exit 1
+          }
+          echo "Outside-boundary test passed."
+
+      - name: Verify four modes documented
+        run: |
+          for mode in "PLAN Mode" "EXECUTE Mode" "REVIEW Mode" "DISTILL Mode"; do
+            grep -q "$mode" SKILL.md || { echo "::error::SKILL.md missing '$mode' section"; exit 1; }
+          done
+          echo "All four modes documented."

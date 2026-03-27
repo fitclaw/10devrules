@@ -1,5 +1,5 @@
-name: Bug report
-description: Report a problem in the skill, documentation, or repository workflow
+name: Bug Report
+description: Report a problem with the agent skill, hook script, or documentation
 title: "[Bug]: "
 labels:
   - bug
@@ -7,9 +7,22 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file a report.
+        Thanks for reporting. Please keep examples generic and avoid posting secrets, personal data, or internal references.
 
-        Please keep examples generic and avoid posting secrets, personal data, private URLs, or internal references.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the project is affected?
+      options:
+        - SKILL.md — Agent workflow (PLAN/EXECUTE/REVIEW/DISTILL)
+        - bin/check-boundary.sh — Hook script
+        - README / Documentation
+        - CI / GitHub workflows
+        - Other
+    validations:
+      required: true
+
   - type: textarea
     id: summary
     attributes:
@@ -18,35 +31,53 @@ body:
       placeholder: A clear and concise summary of the issue
     validations:
       required: true
+
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Expected Behavior
       description: What did you expect to happen?
     validations:
       required: true
+
   - type: textarea
     id: actual
     attributes:
-      label: Actual behavior
+      label: Actual Behavior
       description: What happened instead?
     validations:
       required: true
+
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction steps
+      label: Reproduction Steps
       description: How can someone reproduce the issue?
       placeholder: |
-        1. Go to ...
-        2. Read or apply ...
+        1. Load SKILL.md into Claude Code
+        2. Trigger PLAN mode with "plan this feature"
         3. Observe ...
     validations:
       required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where are you using this skill?
+      options:
+        - Claude Code (CLI)
+        - Claude Code (VS Code)
+        - Claude Code (JetBrains)
+        - Other AI harness
+        - Manual / human use
+    validations:
+      required: false
+
   - type: textarea
     id: context
     attributes:
-      label: Additional context
+      label: Additional Context
       description: Add anything else that helps explain the issue
     validations:
       required: false

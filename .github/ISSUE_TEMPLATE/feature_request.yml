@@ -1,5 +1,5 @@
-name: Feature request
-description: Suggest an improvement to the skill, docs, or repository experience
+name: Feature Request
+description: Suggest an improvement to the agent skill, hooks, or documentation
 title: "[Feature]: "
 labels:
   - enhancement
@@ -7,35 +7,55 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the suggestion.
+        Thanks for the suggestion. Please keep requests general-purpose and avoid posting organization-specific or private context.
 
-        Please keep requests general-purpose and avoid posting organization-specific, customer-specific, or otherwise private context.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature Area
+      description: Which part of the project would this improve?
+      options:
+        - PLAN mode — Scoping, contracts, dependency sequencing, staging
+        - EXECUTE mode — Isolation, review loops, verification
+        - REVIEW mode — 10-rule audit, verdict logic
+        - DISTILL mode — Principle extraction, summary formulas
+        - Hook system — Boundary enforcement or new rule hooks
+        - Documentation / Examples
+        - CI / GitHub workflows
+        - Other
+    validations:
+      required: true
+
   - type: textarea
     id: problem
     attributes:
-      label: Problem to solve
+      label: Problem to Solve
       description: What problem or friction are you trying to solve?
       placeholder: Describe the gap or pain point
     validations:
       required: true
+
   - type: textarea
     id: proposal
     attributes:
-      label: Proposed change
+      label: Proposed Change
       description: What would you like to see added or changed?
     validations:
       required: true
+
+  - type: textarea
+    id: rules
+    attributes:
+      label: Related Rules
+      description: Which of the 10 rules does this relate to? (optional)
+      placeholder: "e.g., Rule 7 (Design failure paths) — the PLAN mode doesn't enumerate failure paths deeply enough"
+    validations:
+      required: false
+
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
+      label: Alternatives Considered
       description: What have you tried or considered already?
-    validations:
-      required: false
-  - type: textarea
-    id: scope
-    attributes:
-      label: Scope notes
-      description: Is this a wording improvement, process improvement, or new supporting asset?
     validations:
       required: false
