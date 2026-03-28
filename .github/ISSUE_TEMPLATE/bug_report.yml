@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a problem with the agent skill, hook script, or documentation
+description: Report a problem with the agent skill, scripts, or documentation
 title: "[Bug]: "
 labels:
   - bug
@@ -15,8 +15,15 @@ body:
       label: Affected Area
       description: Which part of the project is affected?
       options:
-        - SKILL.md — Agent workflow (PLAN/EXECUTE/REVIEW/DISTILL)
-        - bin/check-boundary.sh — Hook script
+        - SKILL.md — Router layer or mode routing
+        - docs/10plan.md — PLAN mode logic
+        - docs/10exec.md — EXECUTE mode logic
+        - docs/10review.md — REVIEW mode logic
+        - docs/10distill.md — DISTILL mode logic
+        - docs/10docs.md — DOCS mode / Obsidian sync
+        - bin/check-boundary.sh — Boundary guard hook
+        - bin/doc-health-audit.sh — Health audit script
+        - bin/doc-sync.sh — Vault sync script
         - README / Documentation
         - CI / GitHub workflows
         - Other
@@ -55,7 +62,7 @@ body:
       description: How can someone reproduce the issue?
       placeholder: |
         1. Load SKILL.md into Claude Code
-        2. Trigger PLAN mode with "plan this feature"
+        2. Run /10plan with "plan this feature"
         3. Observe ...
     validations:
       required: true
@@ -69,6 +76,8 @@ body:
         - Claude Code (CLI)
         - Claude Code (VS Code)
         - Claude Code (JetBrains)
+        - Claude Code (Desktop App)
+        - Claude Code (Web App)
         - Other AI harness
         - Manual / human use
     validations:

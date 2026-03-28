@@ -22,6 +22,13 @@ jobs:
             SECURITY.md
             CODE_OF_CONDUCT.md
             bin/check-boundary.sh
+            bin/doc-health-audit.sh
+            bin/doc-sync.sh
+            docs/10plan.md
+            docs/10exec.md
+            docs/10review.md
+            docs/10distill.md
+            docs/10docs.md
           )
 
           for file in "${required_files[@]}"; do
@@ -89,9 +96,19 @@ jobs:
           }
           echo "Outside-boundary test passed."
 
-      - name: Verify four modes documented
+      - name: Verify five modes in router
         run: |
-          for mode in "PLAN Mode" "EXECUTE Mode" "REVIEW Mode" "DISTILL Mode"; do
-            grep -q "$mode" SKILL.md || { echo "::error::SKILL.md missing '$mode' section"; exit 1; }
+          for mode in "/10plan" "/10exec" "/10review" "/10distill" "/10docs"; do
+            grep -q "$mode" SKILL.md || { echo "::error::SKILL.md missing '$mode' in Mode Router"; exit 1; }
           done
-          echo "All four modes documented."
+          echo "All five modes in router."
+
+      - name: Verify doc scripts are executable
+        run: |
+          for script in bin/doc-health-audit.sh bin/doc-sync.sh; do
+            if [ ! -x "$script" ]; then
+              echo "::error::$script is not executable"
+              exit 1
+            fi
+          done
+          echo "Doc scripts are executable."

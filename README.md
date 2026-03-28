@@ -3,131 +3,132 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Maintained](https://img.shields.io/badge/Maintained-yes-success.svg)](./README.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
-An **agent-driven** development workflow that uses 10 rules as active decision gates — not just a reference list.
+> **AI writes code fast. This skill makes it write code *right*.**
 
-`ten-dev-rules` is a `SKILL.md` agent skill for Claude Code and compatible AI harnesses. It actively orchestrates development work through four operating modes: **PLAN**, **EXECUTE**, **REVIEW**, and **DISTILL**.
+`ten-dev-rules` is an agent skill for [Claude Code](https://claude.ai/claude-code) that transforms 10 engineering rules into **active decision gates** — the AI must scope before coding, freeze contracts before building, verify before shipping. No ceremony, just discipline.
 
-## What Changed in v2.0
+## Why This Exists
 
-v1.x was a passive reference document listing 10 rules. v2.0 transforms it into an **active agent** with:
+AI coding assistants are powerful but undisciplined. Without guardrails, they:
 
-- **Four operating modes** with distinct workflows and structured outputs
-- **Decision gates** at each rule — the agent enforces them, not just suggests
-- **Hook enforcement** — optional `bin/check-boundary.sh` blocks out-of-scope edits (Rule 1)
-- **Sub-agent delegation** — uses Explore agents for contract discovery and dependency analysis
-- **State files** — `.10dev/boundary.txt`, `todo.md`, `lessons.md` for cross-session memory
-- **Structured outputs** — audit reports, stage completion records, distilled principles
+- Start coding before understanding the scope
+- Modify shared interfaces without freezing contracts
+- Skip failure path design and ship happy-path-only code
+- Accumulate stale docs that poison future context
 
-## Table of Contents
+`ten-dev-rules` fixes this by making the AI **enforce engineering discipline on itself** — automatically.
 
-- [The Ten Rules](#the-ten-rules)
-- [Four Operating Modes](#four-operating-modes)
-- [Quick Start](#quick-start)
-- [Hook System](#hook-system)
-- [Repository Structure](#repository-structure)
-- [Example Prompts](#example-prompts)
-- [When To Use It](#when-to-use-it)
-- [When Not To Use It](#when-not-to-use-it)
-- [Privacy And Publishing](#privacy-and-publishing)
-- [FAQ](#faq)
-- [Contributing](#contributing)
-- [Security](#security)
-- [License](#license)
+## 5 Modes, 5 Commands
+
+| Command | Mode | What It Does |
+|---------|------|-------------|
+| `/10plan` | **PLAN** | Scope boundary -> freeze contracts -> sequence dependencies -> stage work -> audit failure paths |
+| `/10exec` | **EXECUTE** | Isolate new complexity -> implement -> review loop -> verify reality -> record lessons |
+| `/10review` | **REVIEW** | Audit code/PR against all 10 rules -> SHIP / SHIP_WITH_CONCERNS / BLOCK verdict |
+| `/10distill` | **DISTILL** | Extract reusable principles from completed work -> one-line summary formula |
+| `/10docs` | **DOCS** | Audit doc health -> cleanup stale artifacts -> sync to Obsidian vault -> snapshot decisions |
+
+All modes also trigger via natural language: "plan this feature", "review this PR", "sync docs", etc.
 
 ## The Ten Rules
 
-Each rule is a **decision gate** enforced at specific points in the workflow:
-
-| # | Rule | Agent Behavior |
-|---|------|----------------|
-| 1 | **Set the boundary** | Must scope before implementation. Hook blocks out-of-scope edits. |
-| 2 | **Freeze the contract** | Must stabilize interfaces before consumers are built. |
-| 3 | **Sequence by dependency** | Must build foundations before consumers. |
-| 4 | **Stage the work** | Must split into phases with entry/exit conditions. |
-| 5 | **Isolate new complexity** | New logic in new files. Shared core edits need justification. |
-| 6 | **Build the review loop** | Every stage: implement → review → fix → re-verify. |
-| 7 | **Design failure paths** | Must enumerate unhappy paths per stage. |
-| 8 | **Compress documentation** | Minimum docs that restore context. Living specs, not history. |
+| # | Rule | What the Agent Does |
+|---|------|---------------------|
+| 1 | **Set the boundary** | Defines solves/defers/removed. Hook blocks out-of-scope edits. |
+| 2 | **Freeze the contract** | Stabilizes interfaces before consumers are built. Blocks if unstable. |
+| 3 | **Sequence by dependency** | Builds foundations first. Flags circular deps for resolution. |
+| 4 | **Stage the work** | Splits into phases with entry/exit conditions. No oversized passes. |
+| 5 | **Isolate new complexity** | New logic in new files. Shared core edits require justification. |
+| 6 | **Build the review loop** | Every stage: implement -> review -> fix -> re-verify. |
+| 7 | **Design failure paths** | Enumerates unhappy paths per stage. Zero failure paths = hard stop. |
+| 8 | **Compress documentation** | Living specs, not history. Minimum docs that restore context. |
 | 9 | **Verify reality** | Must state verified/skipped/risk before marking done. |
-| 10 | **Distill reusable principles** | Extract patterns using action verbs. |
+| 10 | **Distill reusable principles** | Extracts patterns using action verbs: scope, freeze, isolate, verify. |
 
-## Four Operating Modes
-
-### PLAN Mode
-
-Scope and structure work **before** coding. Six phases with decision gates:
-
-1. **Set Boundary** (R1) → solves / defers / removed
-2. **Freeze Contract** (R2) → stabilize interfaces via sub-agent exploration
-3. **Sequence by Dependency** (R3) → build order analysis
-4. **Stage the Work** (R4) → phases with entry/exit conditions
-5. **Failure Path Audit** (R7) → enumerate unhappy paths per stage
-6. **Output** → structured plan document
-
-### EXECUTE Mode
-
-Implement staged work with a verification loop:
-
-```
-For each stage:
-  1. Isolate (R5) — new complexity in new files
-  2. Implement — write code
-  3. Review Loop (R6) — self-review + tests
-  4. Verify (R9) — verified/skipped/risk report
-  5. Update — mark done + record lessons
-```
-
-Includes self-correction: 3-strike escalation on repeated failures.
-
-### REVIEW Mode
-
-Audit existing code or PRs against all 10 rules:
-
-```
-Rule 1  - Boundary:      PASS | DRIFT | VIOLATION
-Rule 2  - Contract:      PASS | UNSTABLE | VIOLATION
-...
-Rule 10 - Distillation:  PASS | SKIPPED | N/A
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Verdict: SHIP | SHIP_WITH_CONCERNS | BLOCK
-```
-
-### DISTILL Mode
-
-Extract reusable principles from completed work → one-line summary formula.
+Each rule is a **gate**, not a suggestion. The agent enforces them at specific workflow points.
 
 ## Quick Start
 
-### Option 1: As a Claude Code Skill
+### 30-Second Setup
 
-1. Copy `SKILL.md` and `bin/` to your Claude Code skills directory.
-2. The agent activates when you start a development task.
-3. Say "plan this feature" or "review this PR" to trigger specific modes.
+```bash
+# Clone into your Claude Code skills directory
+git clone https://github.com/fitclaw/10devrules.git ~/.claude/skills/ten-dev-rules
 
-### Option 2: As Repository Guidance
+# Done. Start any development task and the skill activates automatically.
+```
 
-1. Keep `SKILL.md` in your project root.
-2. Reference it in your `CLAUDE.md` or AI instructions.
-3. The 10 rules serve as your development methodology.
+Or copy `SKILL.md` + `docs/` + `bin/` manually to your preferred location.
 
-### Option 3: Without Hook (Lightweight)
+### Try It
 
-Use only `SKILL.md` without the `bin/` directory. All rules work as agent instructions — the hook is an optional enforcement layer.
+```
+You:   /10plan Add user authentication with OAuth
+Agent: [Sets boundary, discovers existing interfaces, sequences deps, stages work, audits failure paths]
+       -> Structured plan with 4 stages, frozen contracts, and failure paths enumerated
+
+You:   /10exec
+Agent: [For each stage: isolate -> implement -> review -> verify -> update]
+       -> Code delivered with verification records per stage
+
+You:   /10review
+Agent: [Audits diff against all 10 rules]
+       -> SHIP_WITH_CONCERNS: Rule 7 missing timeout handling on token refresh
+
+You:   /10docs
+Agent: [Scans todo.md, lessons.md, contracts for staleness]
+       -> YELLOW: 3 stale tasks, 2 untagged lessons. Recommendation: run /10docs cleanup
+```
+
+## Architecture: Router + Agent Cluster
+
+v2.1 uses a **router-layer architecture** — `SKILL.md` is a lightweight router (~250 lines) that dispatches to detailed mode files. The agent reads only what it needs.
+
+```text
+SKILL.md (router)          docs/ (mode logic)           bin/ (enforcement)
+┌──────────────────┐      ┌─────────────────────┐      ┌────────────────────┐
+│ Rules table      │      │ 10plan.md           │      │ check-boundary.sh  │
+│ Mode router      │─────>│ 10exec.md           │      │ doc-health-audit.sh│
+│ Output templates │      │ 10review.md         │      │ doc-sync.sh        │
+│ Anti-patterns    │      │ 10distill.md        │      └────────────────────┘
+│ State files      │      │ 10docs.md           │
+└──────────────────┘      └─────────────────────┘
+```
+
+## DOCS Mode: Obsidian Integration
+
+`/10docs` manages document health and cross-version memory via Obsidian:
+
+| Sub-Command | What It Does |
+|-------------|-------------|
+| `/10docs audit` | Detect stale tasks, untagged lessons, contract drift, orphaned docs |
+| `/10docs cleanup` | Phase-aware archival: snapshot completed work, start fresh |
+| `/10docs sync` | Push state files to Obsidian vault with YAML frontmatter |
+| `/10docs snapshot` | Create versioned decision records (ADR) |
+| `/10docs index` | Rebuild phase-aware reading order |
+
+Vault structure:
+```
+~/dev-vault/projects/{project}/
+├── _index.md        # Auto-generated reading order
+├── active/          # Current phase docs (with frontmatter)
+├── archive/         # Completed phase snapshots
+├── decisions/       # Versioned ADRs
+└── lessons/         # Organized by topic
+```
 
 ## Hook System
 
-The optional `bin/check-boundary.sh` script enforces Rule 1 (Set the boundary):
+The optional boundary guard hook enforces Rule 1:
 
-- Reads `.10dev/boundary.txt` (allowed edit paths, one per line)
-- Checks every `Edit` and `Write` operation against the boundary
-- **Advisory mode** (`ask`, not `deny`) — the user always decides
-- No boundary file → all edits allowed
-
-Set a boundary manually:
+- Reads `.10dev/boundary.txt` (allowed edit paths)
+- Checks every `Edit` and `Write` against scope
+- **Advisory mode** (`ask`, not `deny`) — you always decide
+- No boundary file = all edits allowed
 
 ```bash
 mkdir -p .10dev
@@ -138,67 +139,60 @@ echo "src/features/auth" > .10dev/boundary.txt
 
 ```text
 .
-├── SKILL.md              # Agent skill (the core)
+├── SKILL.md                  # Router layer
+├── docs/
+│   ├── 10plan.md             # PLAN mode logic
+│   ├── 10exec.md             # EXECUTE mode logic
+│   ├── 10review.md           # REVIEW mode logic
+│   ├── 10distill.md          # DISTILL mode logic
+│   └── 10docs.md             # DOCS mode (Obsidian sync)
 ├── bin/
-│   └── check-boundary.sh # Optional hook for Rule 1 enforcement
+│   ├── check-boundary.sh     # Rule 1 boundary guard
+│   ├── doc-health-audit.sh   # Document health check
+│   └── doc-sync.sh           # Obsidian vault sync engine
 ├── README.md
 ├── README.zh-CN.md
 ├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
 ├── SECURITY.md
 └── LICENSE
 ```
 
-## Example Prompts
-
-- "Plan this feature using ten-dev-rules" → triggers PLAN mode
-- "Review this PR against the 10 rules" → triggers REVIEW mode
-- "Implement stage 2 of the plan" → triggers EXECUTE mode
-- "What did we learn from this project?" → triggers DISTILL mode
-- "Scope this before we start coding" → triggers PLAN Phase 1
-
 ## When To Use It
 
-- Planning a feature before implementation
-- Breaking large tasks into staged deliverables
-- Reviewing code for hidden risk, drift, or missing validation
-- Refactoring while protecting shared contracts
-- Extracting reusable engineering principles
+- **Before coding** — scope the work, freeze contracts, plan stages
+- **During coding** — isolated stages with review loops and verification
+- **After coding** — audit PRs against 10 rules, extract principles
+- **Ongoing** — keep docs healthy, sync decisions to Obsidian
 
 ## When Not To Use It
 
-- Very small edits where the workflow costs more than it saves
-- Open-ended ideation where loose exploration is the goal
+- Trivial one-line fixes (the workflow costs more than the change)
+- Pure brainstorming (loose exploration is the goal)
 - Domains with stricter formal processes that supersede this
-
-## Privacy And Publishing
-
-- No personal names, emails, or organization identifiers required
-- No telemetry, analytics, or external services
-- No internal data, issue IDs, or private URLs
-- All examples are intentionally generic
 
 ## FAQ
 
-### Is this only for AI agents?
+**Is this only for AI agents?**
+No. Humans and agents both benefit. Agents get explicit workflows. Humans get reduced ambiguity.
 
-No. The structure works for both humans and agents. Agents benefit from explicit workflows. Humans benefit from reduced ambiguity.
+**Is this tied to a language or framework?**
+No. Language-agnostic and tool-agnostic.
 
-### Is this tied to a specific language or framework?
+**Can I use it without the hook?**
+Yes. The hook is optional. All rules work as agent instructions in `SKILL.md` alone.
 
-No. Language-agnostic and tool-agnostic by design.
+**What dependencies does it need?**
+Only `bash`, `grep`, `sed`. Standard on macOS and Linux. No npm, no pip, no Docker.
 
-### Does the hook script require any dependencies?
+**Can I modify it for my team?**
+Yes. MIT licensed. Preserve the core rules and adapt everything else.
 
-Only `bash`, `grep`, `sed`, and optionally `python3` (as fallback for JSON parsing). Standard on macOS and Linux.
+## Privacy
 
-### Can I use it without the hook?
-
-Yes. The hook is optional. All 10 rules work as agent instructions in `SKILL.md` alone.
-
-### Can I modify it for my team?
-
-Yes. Preserve the core rules and adapt examples, review checklists, or domain vocabulary.
+- No telemetry, analytics, or external services
+- No personal data required
+- All examples are generic
+- Safe to use in any organization
 
 ## Contributing
 
@@ -210,4 +204,4 @@ See [SECURITY.md](./SECURITY.md).
 
 ## License
 
-MIT License. See [LICENSE](./LICENSE) for full text.
+MIT License. See [LICENSE](./LICENSE).

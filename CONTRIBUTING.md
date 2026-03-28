@@ -6,18 +6,20 @@ This repository is intentionally small. Changes should make the skill clearer, m
 
 ## Project Overview
 
-`ten-dev-rules` is a `SKILL.md` agent skill for Claude Code and compatible AI harnesses. It has:
+`ten-dev-rules` is a `SKILL.md` agent skill for Claude Code with a router-layer architecture:
 
-- **`SKILL.md`** — The core agent skill with four operating modes (PLAN / EXECUTE / REVIEW / DISTILL)
-- **`bin/check-boundary.sh`** — Optional PreToolUse hook enforcing Rule 1 (scope boundary)
+- **`SKILL.md`** — Router layer with rules table, mode router, and output templates
+- **`docs/`** — Detailed logic for each mode (10plan.md, 10exec.md, 10review.md, 10distill.md, 10docs.md)
+- **`bin/`** — Shell scripts: boundary guard hook, doc health audit, Obsidian vault sync
 - **`README.md` / `README.zh-CN.md`** — Documentation in English and Chinese
 
 ## Contribution Goals
 
 Good contributions usually do one of the following:
 
-- Improve decision gate logic in the four operating modes
-- Strengthen the hook enforcement or add new optional hooks for other rules
+- Improve decision gate logic in the five operating modes
+- Strengthen hook enforcement or add new optional hooks for other rules
+- Improve the DOCS mode (Obsidian sync, health audit, cleanup logic)
 - Clarify when the skill should or should not be used
 - Improve wording without adding unnecessary bulk
 - Strengthen review, failure-path, or validation guidance
@@ -51,19 +53,23 @@ Before opening a pull request, check that:
 - [ ] The wording works for both humans and AI agents
 - [ ] No private or identifying information was introduced
 - [ ] Examples remain generic and safe to publish
-- [ ] `README.md`, `README.zh-CN.md`, and `SKILL.md` stay consistent
-- [ ] Hook scripts (if modified) handle edge cases: missing files, empty input, parse failures
+- [ ] `SKILL.md`, `docs/`, and both READMEs stay consistent
+- [ ] Hook/bin scripts handle edge cases: missing files, empty input, parse failures
 - [ ] YAML frontmatter in `SKILL.md` remains valid
 
 ## Suggested Change Types
 
 ### Mode Improvements
 
-Refine the PLAN / EXECUTE / REVIEW / DISTILL workflow phases, decision gates, or output formats.
+Refine PLAN / EXECUTE / REVIEW / DISTILL / DOCS workflow phases, decision gates, or output formats. Each mode's logic lives in `docs/10*.md`.
 
-### Hook Enhancements
+### Hook & Script Enhancements
 
-Improve `check-boundary.sh` or propose new hooks for other rules (e.g., verification enforcement for Rule 9).
+Improve `check-boundary.sh`, `doc-health-audit.sh`, `doc-sync.sh`, or propose new hooks for other rules.
+
+### DOCS Mode Improvements
+
+Enhance Obsidian vault sync, health audit logic, cleanup procedures, or ADR generation.
 
 ### Wording Improvements
 
@@ -86,16 +92,28 @@ Improve `README.zh-CN.md` quality or add new language translations.
 If you modify `bin/check-boundary.sh`, test these three scenarios:
 
 ```bash
-# No boundary file → should output {}
+# No boundary file -> should output {}
 echo '{"tool_input":{"file_path":"any/file.py"}}' | bash bin/check-boundary.sh
 
-# File inside boundary → should output {}
+# File inside boundary -> should output {}
 mkdir -p .10dev && echo "src/" > .10dev/boundary.txt
 echo '{"tool_input":{"file_path":"src/main.py"}}' | bash bin/check-boundary.sh
 
-# File outside boundary → should output permissionDecision: "ask"
+# File outside boundary -> should output permissionDecision: "ask"
 echo '{"tool_input":{"file_path":"docs/readme.md"}}' | bash bin/check-boundary.sh
 rm -rf .10dev
+```
+
+If you modify `bin/doc-health-audit.sh`, test with and without state files:
+
+```bash
+# No state files -> should output GREEN health
+bash bin/doc-health-audit.sh . 7
+
+# With state files -> verify counts are correct
+echo "- [x] Done task" > todo.md
+bash bin/doc-health-audit.sh . 0
+rm todo.md
 ```
 
 ## Privacy Checklist

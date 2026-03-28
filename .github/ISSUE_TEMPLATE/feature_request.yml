@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest an improvement to the agent skill, hooks, or documentation
+description: Suggest an improvement to the agent skill, modes, hooks, or documentation
 title: "[Feature]: "
 labels:
   - enhancement
@@ -15,11 +15,13 @@ body:
       label: Feature Area
       description: Which part of the project would this improve?
       options:
-        - PLAN mode — Scoping, contracts, dependency sequencing, staging
-        - EXECUTE mode — Isolation, review loops, verification
-        - REVIEW mode — 10-rule audit, verdict logic
-        - DISTILL mode — Principle extraction, summary formulas
+        - PLAN mode (/10plan) — Scoping, contracts, dependency sequencing, staging
+        - EXECUTE mode (/10exec) — Isolation, review loops, verification
+        - REVIEW mode (/10review) — 10-rule audit, verdict logic
+        - DISTILL mode (/10distill) — Principle extraction, summary formulas
+        - DOCS mode (/10docs) — Health audit, cleanup, Obsidian sync, ADR snapshots
         - Hook system — Boundary enforcement or new rule hooks
+        - Router architecture — SKILL.md structure, mode routing
         - Documentation / Examples
         - CI / GitHub workflows
         - Other

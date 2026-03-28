@@ -1,14 +1,15 @@
 # Security Policy
 
-This repository ships an AI agent skill (`SKILL.md`) and an optional shell hook (`bin/check-boundary.sh`). While it does not run a hosted service, security concerns can still exist.
+This repository ships an AI agent skill (`SKILL.md`), mode detail files (`docs/`), and shell scripts (`bin/`). While it does not run a hosted service, security concerns can still exist.
 
 ## Threat Surface
 
 | Area | Risk |
 |------|------|
-| **Prompt injection** | Malicious examples or instructions hidden in the skill that trick an AI agent into destructive actions |
-| **Hook script** | `check-boundary.sh` runs as a PreToolUse hook — a compromised version could suppress warnings or exfiltrate file paths |
-| **Unsafe guidance** | Rules or examples that could cause data loss, credential exposure, or destructive commands in downstream use |
+| **Prompt injection** | Malicious instructions hidden in skill files that trick an AI agent into destructive actions |
+| **Hook scripts** | `check-boundary.sh` runs as a PreToolUse hook — a compromised version could suppress warnings or exfiltrate file paths |
+| **Doc sync scripts** | `doc-sync.sh` writes files to the Obsidian vault — a compromised version could overwrite unrelated files |
+| **Unsafe guidance** | Rules or examples that could cause data loss, credential exposure, or destructive commands |
 | **Data leaks** | Accidental inclusion of secrets, personal data, or private references in any file |
 | **Malicious links** | Untrusted external URLs added to documentation or examples |
 
@@ -23,7 +24,7 @@ If you find a security issue:
 ## What To Include
 
 - A short description of the problem
-- The affected file or section (e.g., `SKILL.md` line 42, `bin/check-boundary.sh`)
+- The affected file or section (e.g., `SKILL.md`, `docs/10docs.md`, `bin/doc-sync.sh`)
 - Why the issue matters (what could go wrong in real use)
 - Safe reproduction steps, if applicable
 - A suggested fix, if you have one
@@ -37,21 +38,20 @@ Maintainers should aim to:
 - Remove sensitive material quickly if posted accidentally
 - Ship a fix in the smallest safe change
 
-## Hook Script Security
+## Script Security
 
-The `bin/check-boundary.sh` hook:
+All scripts in `bin/`:
 
-- Reads JSON from stdin and extracts `file_path`
-- Reads `.10dev/boundary.txt` for allowed paths
-- Returns `permissionDecision: "ask"` (advisory) for out-of-scope edits
-- Does NOT execute any commands from the JSON input
-- Does NOT transmit data to external services
-- Falls back to allowing edits if parsing fails (fail-open, not fail-closed)
+- Read input from stdin or file arguments only
+- Do NOT execute commands from user-controlled input (no `eval`, no `exec`)
+- Do NOT transmit data to external services
+- Do NOT modify files outside their declared scope
+- Fall back to safe defaults if parsing fails (fail-open for boundary check, no-op for sync)
 
-When reviewing hook changes, verify that:
+When reviewing script changes, verify that:
 - No `eval`, `exec`, or command substitution is applied to user-controlled input
 - No network calls are made
-- The fail-open behavior is preserved
+- File operations stay within declared directories
 
 ## Disclosure Expectations
 
