@@ -1,0 +1,4 @@
+docs/10plan.md
+docs/10exec.md
+docs/state-files.md
+SKILL.md

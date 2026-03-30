@@ -13,8 +13,12 @@ cd "$PROJECT_ROOT"
 STALE_TASKS=0
 TODO_TOTAL=0
 if [ -f todo.md ]; then
-  TODO_TOTAL=$(grep -c '^\- \[' todo.md 2>/dev/null || echo "0")
-  DONE_COUNT=$(grep -c '^\- \[x\]' todo.md 2>/dev/null || echo "0")
+  TODO_TOTAL=$(grep -c '^\- \[' todo.md 2>/dev/null || true)
+  TODO_TOTAL=$(echo "$TODO_TOTAL" | tr -d '[:space:]')
+  TODO_TOTAL=${TODO_TOTAL:-0}
+  DONE_COUNT=$(grep -c '^\- \[x\]' todo.md 2>/dev/null || true)
+  DONE_COUNT=$(echo "$DONE_COUNT" | tr -d '[:space:]')
+  DONE_COUNT=${DONE_COUNT:-0}
   if [ "$DONE_COUNT" -gt 0 ]; then
     # Check file modification time — if todo.md hasn't been touched in threshold days, completed tasks are stale
     if [ "$(uname)" = "Darwin" ]; then
@@ -35,9 +39,13 @@ UNTAGGED_LESSONS=0
 LESSONS_TOTAL=0
 if [ -f lessons.md ]; then
   # Count lines starting with "- " or "* " as entries
-  LESSONS_TOTAL=$(grep -cE '^\s*[-*] ' lessons.md 2>/dev/null || echo "0")
+  LESSONS_TOTAL=$(grep -cE '^\s*[-*] ' lessons.md 2>/dev/null || true)
+  LESSONS_TOTAL=$(echo "$LESSONS_TOTAL" | tr -d '[:space:]')
+  LESSONS_TOTAL=${LESSONS_TOTAL:-0}
   # Untagged = entries without R1-R10 or topic tags like [scoping], [contract], etc.
-  TAGGED=$(grep -cE '^\s*[-*] .*(\[R[0-9]+\]|\[scoping\]|\[contract\]|\[dependency\]|\[staging\]|\[isolation\]|\[review\]|\[failure\]|\[docs\]|\[verification\]|\[distill\])' lessons.md 2>/dev/null || echo "0")
+  TAGGED=$(grep -cE '^\s*[-*] .*(\[R[0-9]+\]|\[scoping\]|\[contract\]|\[dependency\]|\[staging\]|\[isolation\]|\[review\]|\[failure\]|\[docs\]|\[verification\]|\[distill\])' lessons.md 2>/dev/null || true)
+  TAGGED=$(echo "$TAGGED" | tr -d '[:space:]')
+  TAGGED=${TAGGED:-0}
   UNTAGGED_LESSONS=$(( LESSONS_TOTAL - TAGGED ))
   if [ "$UNTAGGED_LESSONS" -lt 0 ]; then
     UNTAGGED_LESSONS=0
@@ -68,9 +76,9 @@ if [ -f .10dev/boundary.txt ]; then
       allowed=$(printf '%s' "$allowed" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
       [ -z "$allowed" ] && continue
       [[ "$allowed" == \#* ]] && continue
-      case "$recent_file" in
-        "$allowed"*) IN_SCOPE=true; break ;;
-      esac
+      if [ "$recent_file" = "$allowed" ] || case "$recent_file" in "${allowed}/"*) true;; *) false;; esac; then
+        IN_SCOPE=true; break
+      fi
     done < .10dev/boundary.txt
     if [ "$IN_SCOPE" = false ]; then
       BOUNDARY_VIOLATIONS=$((BOUNDARY_VIOLATIONS + 1))

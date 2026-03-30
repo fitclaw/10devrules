@@ -35,6 +35,3 @@ PLAN wrote "Files to touch" but todo.md had no field for it. EXECUTE needed it b
 ---
 
 **Formula:** split the monolith, match the platform, symlink the truth, stage the surface, enforce don't suggest, design for your consumer, version your intent, enforce the schema, trace across boundaries.
-
-## Phase Complete: codex6-stage-format (2026-03-30)
-
