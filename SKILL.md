@@ -246,6 +246,19 @@ The agent uses these files to maintain state across sessions. All are optional �
 | `~/.10dev/developer-profile.md` | Global developer blind spots + preferences (L1) | DISTILL bootstrap |
 | `~/.10dev/universal-principles.md` | Abstracted universal principles (L2) | DISTILL L1→L2 promotion |
 | `~/.10dev/projects.txt` | Global registry of known project paths | PLAN Phase 0 |
+| `~/.10dev/.onboarded` | Global onboarding flag | /10dev Phase 1 |
+| `~/.10dev/.routing_declined` | User declined CLAUDE.md routing | /10dev Phase 2 |
+
+---
+
+## Tool Commands
+
+These are utility commands, not work modes. They do not appear in the Mode Router table.
+
+| Command | Purpose | Detail |
+|---------|---------|--------|
+| `/10dev` | Orchestrator — onboarding, project scan, status dashboard | Read `docs/10dev.md` |
+| `/10profile` | View/manage developer blind spots and preferences | Read `skills/10profile/SKILL.md` |
 
 ---
 
