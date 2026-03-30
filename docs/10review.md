@@ -22,6 +22,27 @@ Audit existing code, a PR, or completed work against all 10 rules.
 
 3. Output the audit report using the review output template in SKILL.md.
 
+## Developer Profile Match (if profile exists)
+
+After producing the standard review report, check `~/.10dev/developer-profile.md`:
+
+1. If file exists, read it.
+2. For each review finding that is DRIFT, VIOLATION, MISSING, INCOMPLETE, or STALE:
+   - Compare the finding's category against blind spot `Keywords` fields.
+   - If a match is found, append a profile match note to the report.
+3. Append a **Profile Match** section after the verdict:
+
+```
+## Profile Match
+  R7 MISSING matches known pattern: "Skips failure path design" (seen 2 times)
+  R1 DRIFT matches known pattern: "Assumes platform behavior" (seen 3 times)
+
+  Recurring patterns detected: {count} of {total findings} match your profile.
+```
+
+4. If no findings match any blind spot, skip this section.
+5. The Profile Match section is informational only — it does not change the verdict.
+
 ## Verdict Logic
 
 - All PASS -> **SHIP**

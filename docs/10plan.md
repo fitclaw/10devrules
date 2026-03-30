@@ -1,6 +1,33 @@
 # PLAN Mode
 
-Enter this mode to scope and structure work BEFORE coding. Proceeds through 6 phases with decision gates.
+Enter this mode to scope and structure work BEFORE coding. Proceeds through 7 phases with decision gates.
+
+## Phase 0: Developer Profile Check
+
+1. Check for developer profile: `[ -f ~/.10dev/developer-profile.md ]`
+2. If file exists, read it into context.
+3. Also check for universal principles: `[ -f ~/.10dev/universal-principles.md ]` — if exists, read it.
+4. Register this project in the global registry:
+
+```bash
+mkdir -p ~/.10dev
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+grep -qxF "$_PROJECT_ROOT" ~/.10dev/projects.txt 2>/dev/null || echo "$_PROJECT_ROOT" >> ~/.10dev/projects.txt
+```
+
+5. **New project detection**: If this project path was just added to `projects.txt` (not previously present) AND the profile has blind spots, generate a **welcome message**:
+
+```
+Welcome to a new project. Based on your developer profile:
+
+Your top blind spots for this type of work:
+⚠ HIGH: {pattern_name} — {defense}
+  MEDIUM: {pattern_name} — {defense}
+
+I'll include these in the plan's WATCH LIST.
+```
+
+6. If no profile exists, proceed silently to Phase 1.
 
 ## Phase 1: Set the Boundary (Rule 1)
 
@@ -72,6 +99,31 @@ B) This stage genuinely has no failure modes (rare — confirm?)
 C) Defer to implementation — mark as tech debt
 ```
 
-## Phase 6: Plan Output
+## Phase 6: WATCH LIST (Developer Profile Gate)
 
-Produce the structured plan using the output template defined in SKILL.md.
+If a developer profile was loaded in Phase 0:
+
+1. For each blind spot in the profile, check its `Keywords` field against the task boundary (Phase 1) and contract surface (Phase 2).
+2. If keyword match found, OR the trigger scenario is relevant to this task (agent judgment as fallback), include it in the WATCH LIST.
+3. Insert WATCH LIST into the plan output after Boundary, before Contract:
+
+```
+## WATCH LIST (from developer profile)
+
+⚠ HIGH: {pattern_name}
+  Trigger: {trigger description}
+  Defense: {defense action}
+  - [ ] Acknowledged: {pattern_name}
+
+MEDIUM: {pattern_name}
+  Trigger: {trigger description}
+  Defense: {defense action}
+```
+
+4. HIGH severity items add an acknowledgment checkbox. The plan is not blocked, but the unchecked item is visible.
+5. LOW severity items are only included if keyword match is strong.
+6. If no blind spots match the current task, skip the WATCH LIST section.
+
+## Phase 7: Plan Output
+
+Produce the structured plan using the output template defined in SKILL.md. The WATCH LIST (if any) is included between the Boundary and Contract sections.

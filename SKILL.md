@@ -129,6 +129,11 @@ Solves: ...
 Defers: ...
 Removed: ...
 
+## WATCH LIST (from developer profile, if any)
+⚠ HIGH: [pattern] — [defense]
+  - [ ] Acknowledged: [pattern]
+MEDIUM: [pattern] — [defense]
+
 ## Contract (R2)
 [frozen interfaces/types/schemas]
 
@@ -233,11 +238,14 @@ The agent uses these files to maintain state across sessions. All are optional �
 | File | Purpose | Created by |
 |------|---------|-----------|
 | `todo.md` | Living task plan with checkboxes | PLAN Phase 4 |
-| `lessons.md` | Cross-session learning | DISTILL mode, self-correction |
+| `lessons.md` | Cross-session learning (L0) | DISTILL mode, self-correction |
 | `.10dev/boundary.txt` | Scope boundary for hook enforcement (one allowed path per line) | PLAN Phase 1 |
 | `.10dev/contract.md` | Frozen contract definitions | PLAN Phase 2 |
 | `.10dev/doc-sync.yaml` | Vault sync configuration | DOCS first-run |
 | `.10dev/archive/` | Archived phase snapshots | DOCS CLEANUP |
+| `~/.10dev/developer-profile.md` | Global developer blind spots + preferences (L1) | DISTILL bootstrap |
+| `~/.10dev/universal-principles.md` | Abstracted universal principles (L2) | DISTILL L1→L2 promotion |
+| `~/.10dev/projects.txt` | Global registry of known project paths | PLAN Phase 0 |
 
 ---
 
