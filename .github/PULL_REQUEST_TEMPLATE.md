@@ -5,8 +5,11 @@ Briefly describe what changed and why.
 ## Change Type
 
 - [ ] Mode logic update (PLAN / EXECUTE / REVIEW / DISTILL / DOCS)
+- [ ] /10dev orchestrator or onboarding
+- [ ] Developer profile / learning system (L0/L1/L2)
 - [ ] Hook or bin script update
-- [ ] Documentation update (README, CONTRIBUTING, etc.)
+- [ ] Slash command wrapper (skills/*/SKILL.md)
+- [ ] Documentation update (README, CONTRIBUTING, state-files.md)
 - [ ] DOCS mode / Obsidian integration
 - [ ] CI/workflow update
 - [ ] Translation improvement
@@ -29,9 +32,11 @@ Briefly describe what changed and why.
 
 - [ ] The change keeps the skill general-purpose (language-agnostic, project-agnostic)
 - [ ] No personal or private information was introduced
-- [ ] `SKILL.md`, `docs/`, and both READMEs stay consistent
+- [ ] `SKILL.md`, `docs/`, `skills/*/SKILL.md`, and both READMEs stay consistent
 - [ ] YAML frontmatter in `SKILL.md` is valid
 - [ ] Hook/bin scripts handle edge cases (missing files, empty input, parse failures)
+- [ ] State file format changes update `docs/state-files.md`
+- [ ] Global state writes (~/.10dev/) use safe write protocol
 
 ## Notes
 

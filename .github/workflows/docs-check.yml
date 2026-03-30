@@ -29,6 +29,15 @@ jobs:
             docs/10review.md
             docs/10distill.md
             docs/10docs.md
+            docs/10dev.md
+            docs/state-files.md
+            skills/10dev/SKILL.md
+            skills/10plan/SKILL.md
+            skills/10exec/SKILL.md
+            skills/10review/SKILL.md
+            skills/10distill/SKILL.md
+            skills/10docs/SKILL.md
+            skills/10profile/SKILL.md
           )
 
           for file in "${required_files[@]}"; do
@@ -46,7 +55,6 @@ jobs:
 
       - name: Verify SKILL.md frontmatter
         run: |
-          # Check YAML frontmatter exists and has required fields
           head -1 SKILL.md | grep -q "^---$" || { echo "::error::SKILL.md missing YAML frontmatter"; exit 1; }
           grep -q "^name:" SKILL.md || { echo "::error::SKILL.md missing 'name' field"; exit 1; }
           grep -q "^version:" SKILL.md || { echo "::error::SKILL.md missing 'version' field"; exit 1; }
@@ -54,13 +62,22 @@ jobs:
           grep -q "^allowed-tools:" SKILL.md || { echo "::error::SKILL.md missing 'allowed-tools' field"; exit 1; }
           echo "SKILL.md frontmatter valid."
 
-      - name: Verify hook script is executable
+      - name: Verify skill wrappers have name field
         run: |
-          if [ ! -x "bin/check-boundary.sh" ]; then
-            echo "::error::bin/check-boundary.sh is not executable"
-            exit 1
-          fi
-          echo "Hook script is executable."
+          for skill in skills/*/SKILL.md; do
+            grep -q "^name:" "$skill" || { echo "::error::$skill missing 'name' field"; exit 1; }
+          done
+          echo "All skill wrappers have name field."
+
+      - name: Verify hook scripts are executable
+        run: |
+          for script in bin/check-boundary.sh bin/doc-health-audit.sh bin/doc-sync.sh; do
+            if [ ! -x "$script" ]; then
+              echo "::error::$script is not executable"
+              exit 1
+            fi
+          done
+          echo "All scripts are executable."
 
       - name: Test hook script — no boundary file
         run: |
@@ -96,6 +113,15 @@ jobs:
           }
           echo "Outside-boundary test passed."
 
+      - name: Test doc-health-audit outputs valid JSON
+        run: |
+          output=$(bash bin/doc-health-audit.sh . 7 2>&1)
+          echo "$output" | python3 -m json.tool > /dev/null || {
+            echo "::error::doc-health-audit.sh produced invalid JSON: $output"
+            exit 1
+          }
+          echo "Doc health audit JSON valid."
+
       - name: Verify five modes in router
         run: |
           for mode in "/10plan" "/10exec" "/10review" "/10distill" "/10docs"; do
@@ -103,12 +129,16 @@ jobs:
           done
           echo "All five modes in router."
 
-      - name: Verify doc scripts are executable
+      - name: Verify tool commands in SKILL.md
         run: |
-          for script in bin/doc-health-audit.sh bin/doc-sync.sh; do
-            if [ ! -x "$script" ]; then
-              echo "::error::$script is not executable"
-              exit 1
-            fi
+          for cmd in "/10dev" "/10profile"; do
+            grep -q "$cmd" SKILL.md || { echo "::error::SKILL.md missing tool command '$cmd'"; exit 1; }
           done
-          echo "Doc scripts are executable."
+          echo "Tool commands present."
+
+      - name: Verify version consistency
+        run: |
+          VERSION=$(grep "^version:" SKILL.md | head -1 | awk '{print $2}')
+          grep -q "$VERSION" README.md || { echo "::error::README.md version badge doesn't match SKILL.md ($VERSION)"; exit 1; }
+          grep -q "$VERSION" README.zh-CN.md || { echo "::error::README.zh-CN.md version badge doesn't match SKILL.md ($VERSION)"; exit 1; }
+          echo "Version $VERSION consistent across files."

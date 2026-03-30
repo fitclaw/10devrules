@@ -16,11 +16,14 @@ body:
       description: Which part of the project is affected?
       options:
         - SKILL.md — Router layer or mode routing
-        - docs/10plan.md — PLAN mode logic
-        - docs/10exec.md — EXECUTE mode logic
-        - docs/10review.md — REVIEW mode logic
-        - docs/10distill.md — DISTILL mode logic
+        - docs/10plan.md — PLAN mode (7 phases + WATCH LIST)
+        - docs/10exec.md — EXECUTE mode (stage loop + file drift)
+        - docs/10review.md — REVIEW mode (audit + profile match)
+        - docs/10distill.md — DISTILL mode (3-layer learning)
         - docs/10docs.md — DOCS mode / Obsidian sync
+        - docs/10dev.md — /10dev orchestrator / onboarding
+        - skills/*/SKILL.md — Slash command wrappers
+        - Developer profile (~/.10dev/developer-profile.md)
         - bin/check-boundary.sh — Boundary guard hook
         - bin/doc-health-audit.sh — Health audit script
         - bin/doc-sync.sh — Vault sync script

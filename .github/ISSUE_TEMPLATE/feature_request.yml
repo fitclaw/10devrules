@@ -15,11 +15,14 @@ body:
       label: Feature Area
       description: Which part of the project would this improve?
       options:
-        - PLAN mode (/10plan) — Scoping, contracts, dependency sequencing, staging
-        - EXECUTE mode (/10exec) — Isolation, review loops, verification
-        - REVIEW mode (/10review) — 10-rule audit, verdict logic
-        - DISTILL mode (/10distill) — Principle extraction, summary formulas
+        - PLAN mode (/10plan) — Scoping, contracts, staging, WATCH LIST
+        - EXECUTE mode (/10exec) — Isolation, review loops, file drift detection
+        - REVIEW mode (/10review) — 10-rule audit, verdict logic, profile match
+        - DISTILL mode (/10distill) — Principle extraction, 3-layer learning, profile update
         - DOCS mode (/10docs) — Health audit, cleanup, Obsidian sync, ADR snapshots
+        - /10dev — Onboarding orchestrator, project scan, dashboard
+        - /10profile — Developer profile viewer/manager
+        - Developer profile system — L0/L1/L2 learning, blind spot tracking
         - Hook system — Boundary enforcement or new rule hooks
         - Router architecture — SKILL.md structure, mode routing
         - Documentation / Examples

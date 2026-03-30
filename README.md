@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -18,30 +18,34 @@ AI coding assistants are powerful but undisciplined. Without guardrails, they:
 - Start coding before understanding the scope
 - Modify shared interfaces without freezing contracts
 - Skip failure path design and ship happy-path-only code
-- Accumulate stale docs that poison future context
+- Repeat the same mistakes across different projects
 
-`ten-dev-rules` fixes this by making the AI **enforce engineering discipline on itself** — automatically.
+`ten-dev-rules` fixes this by making the AI **enforce engineering discipline on itself** — and **learn from your mistakes** across projects.
 
-## 5 Modes, 5 Commands
+## 8 Commands
 
-| Command | Mode | What It Does |
+| Command | Type | What It Does |
 |---------|------|-------------|
-| `/10plan` | **PLAN** | Scope boundary -> freeze contracts -> sequence dependencies -> stage work -> audit failure paths |
-| `/10exec` | **EXECUTE** | Isolate new complexity -> implement -> review loop -> verify reality -> record lessons |
-| `/10review` | **REVIEW** | Audit code/PR against all 10 rules -> SHIP / SHIP_WITH_CONCERNS / BLOCK verdict |
-| `/10distill` | **DISTILL** | Extract reusable principles from completed work -> one-line summary formula |
-| `/10docs` | **DOCS** | Audit doc health -> cleanup stale artifacts -> sync to Obsidian vault -> snapshot decisions |
+| `/10dev` | Entry | Onboarding, project scan, status dashboard |
+| `/10plan` | Mode | Scope boundary -> freeze contracts -> sequence deps -> stage work -> WATCH LIST |
+| `/10exec` | Mode | Isolate complexity -> implement -> review loop -> verify -> record lessons |
+| `/10review` | Mode | Audit code/PR against all 10 rules -> SHIP / BLOCK verdict + profile match |
+| `/10distill` | Mode | Extract principles -> update developer profile -> cross-project pattern detection |
+| `/10docs` | Mode | Audit doc health -> cleanup stale artifacts -> sync to Obsidian vault |
+| `/10profile` | Tool | View/manage developer blind spots, preferences, and progress |
 
-All modes also trigger via natural language: "plan this feature", "review this PR", "sync docs", etc.
+All modes also trigger via natural language: "plan this feature", "review this PR", "what did we learn", etc.
+
+**New to 10devrules? Start with `/10dev`** — it guides you through setup and launches your first mode.
 
 ## The Ten Rules
 
 | # | Rule | What the Agent Does |
 |---|------|---------------------|
 | 1 | **Set the boundary** | Defines solves/defers/removed. Hook blocks out-of-scope edits. |
-| 2 | **Freeze the contract** | Stabilizes interfaces before consumers are built. Blocks if unstable. |
+| 2 | **Freeze the contract** | Stabilizes interfaces before consumers are built. Writes `.10dev/contract.md`. |
 | 3 | **Sequence by dependency** | Builds foundations first. Flags circular deps for resolution. |
-| 4 | **Stage the work** | Splits into phases with entry/exit conditions. No oversized passes. |
+| 4 | **Stage the work** | Splits into phases with entry/exit conditions and predicted file lists. |
 | 5 | **Isolate new complexity** | New logic in new files. Shared core edits require justification. |
 | 6 | **Build the review loop** | Every stage: implement -> review -> fix -> re-verify. |
 | 7 | **Design failure paths** | Enumerates unhappy paths per stage. Zero failure paths = hard stop. |
@@ -59,69 +63,103 @@ Each rule is a **gate**, not a suggestion. The agent enforces them at specific w
 # Clone into your Claude Code skills directory
 git clone https://github.com/fitclaw/10devrules.git ~/.claude/skills/ten-dev-rules
 
-# Done. Start any development task and the skill activates automatically.
-```
+# Register per-mode slash commands
+cd ~/.claude/skills
+for cmd in 10dev 10plan 10exec 10review 10distill 10docs 10profile; do
+  ln -sf ten-dev-rules/skills/$cmd $cmd
+done
 
-Or copy `SKILL.md` + `docs/` + `bin/` manually to your preferred location.
+# Done. Type /10dev to get started.
+```
 
 ### Try It
 
 ```
+You:   /10dev
+Agent: [Detects new project, scans environment, offers CLAUDE.md routing setup]
+       -> Environment ready. What would you like to do first?
+
 You:   /10plan Add user authentication with OAuth
-Agent: [Sets boundary, discovers existing interfaces, sequences deps, stages work, audits failure paths]
-       -> Structured plan with 4 stages, frozen contracts, and failure paths enumerated
+Agent: [Sets boundary, freezes contracts, sequences deps, stages work, shows WATCH LIST]
+       -> Structured plan with 4 stages, frozen contracts, failure paths, and profile warnings
 
 You:   /10exec
 Agent: [For each stage: isolate -> implement -> review -> verify -> update]
-       -> Code delivered with verification records per stage
+       -> Code delivered with file drift detection and verification records
 
 You:   /10review
-Agent: [Audits diff against all 10 rules]
-       -> SHIP_WITH_CONCERNS: Rule 7 missing timeout handling on token refresh
+Agent: [Audits diff against all 10 rules, matches findings against profile]
+       -> SHIP_WITH_CONCERNS: Rule 7 missing timeout handling. Profile match: known blind spot.
 
 You:   /10distill
 Agent: [Extracts patterns, compares against developer profile]
-       -> 2 principles extracted. Profile updated: "Skips failure paths" frequency 2→3.
+       -> 2 principles extracted. Profile updated: "Skips failure paths" frequency 2->3.
 
 You:   /10profile
-Agent: -> 3 blind spots tracked (1 HIGH, 2 MEDIUM). Pattern "Assumes platform behavior" healed.
+Agent: -> 3 blind spots tracked (1 HIGH, 2 MEDIUM). Last healed: "Assumes platform behavior".
 
 You:   /10docs
 Agent: [Scans todo.md, lessons.md, contracts for staleness]
-       -> YELLOW: 3 stale tasks, 2 untagged lessons. Recommendation: run /10docs cleanup
+       -> GREEN: All documents healthy. 0 stale tasks.
 ```
 
-New to 10devrules? Start with `/10dev` — it guides you through setup and launches your first mode.
+## Developer Profile: Three-Layer Learning
 
-## Architecture: Router + Agent Cluster
+10devrules learns from your mistakes across projects.
 
-v2.2 uses a **router-layer architecture** with per-mode skill wrappers and a three-layer learning system.
+```text
+L0: Project lessons (lessons.md)         -> what we learned THIS project
+L1: Developer blind spots (profile)      -> recurring patterns across projects
+L2: Universal principles                 -> abstracted, project-independent
+```
+
+The profile lives at `~/.10dev/developer-profile.md` (global). When you run `/10plan`, it reads your profile and generates a **WATCH LIST** — proactive warnings based on your known blind spots. When you run `/10distill`, it compares new lessons against your profile and proposes updates.
+
+```
+## WATCH LIST (from developer profile)
+
+! HIGH: Assumes platform behavior
+  Trigger: Developing plugins/extensions for a host platform
+  Defense: Add task — "Verify platform's extension discovery mechanism"
+  - [ ] Acknowledged: Assumes platform behavior
+
+MEDIUM: Skips failure path design
+  Trigger: Feature development enters "excitement" phase
+  Defense: Rule 7 gate — enumerate unhappy paths per stage
+```
+
+Features:
+- **Keyword-based matching** with agent judgment fallback
+- **Safe write protocol** (atomic mv + .bak backup) for concurrent session protection
+- **Blind spot healing** — auto-propose severity downgrade after 6 months quiet
+- **Distill diff** — see what changed in your profile after each /10distill
+- **Profile export** — anonymized markdown for sharing
+
+## Architecture
+
+v2.3 uses a **router-layer architecture** with per-mode skill wrappers.
 
 ```text
 SKILL.md (router)          docs/ (mode logic)           skills/ (slash commands)
-┌──────────────────┐      ┌─────────────────────┐      ┌────────────────────┐
-│ Rules table      │      │ 10plan.md           │      │ 10dev/   (entry)   │
-│ Mode router      │─────>│ 10exec.md           │      │ 10plan/  10exec/   │
-│ Output templates │      │ 10review.md         │      │ 10review/ 10distill│
-│ Anti-patterns    │      │ 10distill.md        │      │ 10docs/ 10profile/ │
-│ State files      │      │ 10docs.md           │      └────────────────────┘
-│ Tool commands    │      │ 10dev.md            │      bin/ (enforcement)
-└──────────────────┘      │ state-files.md      │      ┌────────────────────┐
-                          └─────────────────────┘      │ check-boundary.sh  │
-                                                       │ doc-health-audit.sh│
-                                                       │ doc-sync.sh        │
-                                                       └────────────────────┘
++-----------------+       +--------------------+       +--------------------+
+| Rules table     |       | 10plan.md          |       | 10dev/   (entry)   |
+| Mode router     |------>| 10exec.md          |       | 10plan/  10exec/   |
+| Output templates|       | 10review.md        |       | 10review/ 10distill|
+| Anti-patterns   |       | 10distill.md       |       | 10docs/ 10profile/ |
+| State files     |       | 10docs.md          |       +--------------------+
+| Tool commands   |       | 10dev.md           |       bin/ (enforcement)
++-----------------+       | state-files.md     |       +--------------------+
+                          +--------------------+       | check-boundary.sh  |
+                                                       | doc-health-audit.sh|
+                                                       | doc-sync.sh        |
+                                                       +--------------------+
+
+Global state (~/.10dev/):
+  developer-profile.md    L1 blind spots + preferences
+  universal-principles.md L2 abstracted principles
+  projects.txt            project registry
+  .onboarded              onboarding flag
 ```
-
-### Developer Profile (Three-Layer Learning)
-
-```text
-L0: Project lessons (lessons.md)     — what we learned THIS project
-L1: Developer blind spots (profile)  — recurring patterns across projects
-L2: Universal principles             — abstracted, project-independent
-```
-
-The profile lives at `~/.10dev/developer-profile.md` (global, cross-project). `/10plan` reads it to generate a WATCH LIST. `/10distill` updates it. `/10profile` views and manages it.
 
 ## DOCS Mode: Obsidian Integration
 
@@ -135,16 +173,6 @@ The profile lives at `~/.10dev/developer-profile.md` (global, cross-project). `/
 | `/10docs snapshot` | Create versioned decision records (ADR) |
 | `/10docs index` | Rebuild phase-aware reading order |
 
-Vault structure:
-```
-~/dev-vault/projects/{project}/
-├── _index.md        # Auto-generated reading order
-├── active/          # Current phase docs (with frontmatter)
-├── archive/         # Completed phase snapshots
-├── decisions/       # Versioned ADRs
-└── lessons/         # Organized by topic
-```
-
 ## Hook System
 
 The optional boundary guard hook enforces Rule 1:
@@ -153,32 +181,29 @@ The optional boundary guard hook enforces Rule 1:
 - Checks every `Edit` and `Write` against scope
 - **Advisory mode** (`ask`, not `deny`) — you always decide
 - No boundary file = all edits allowed
-
-```bash
-mkdir -p .10dev
-echo "src/features/auth" > .10dev/boundary.txt
-```
+- Directory-safe matching (prevents `/src` from matching `/src-old`)
 
 ## Repository Structure
 
 ```text
 .
-├── SKILL.md                  # Router layer
-├── docs/
-│   ├── 10plan.md             # PLAN mode logic
-│   ├── 10exec.md             # EXECUTE mode logic
-│   ├── 10review.md           # REVIEW mode logic
-│   ├── 10distill.md          # DISTILL mode logic
-│   └── 10docs.md             # DOCS mode (Obsidian sync)
-├── bin/
-│   ├── check-boundary.sh     # Rule 1 boundary guard
-│   ├── doc-health-audit.sh   # Document health check
-│   └── doc-sync.sh           # Obsidian vault sync engine
-├── README.md
-├── README.zh-CN.md
-├── CONTRIBUTING.md
-├── SECURITY.md
-└── LICENSE
++-- SKILL.md                  # Router layer (v2.3)
++-- docs/
+|   +-- 10plan.md             # PLAN mode (7 phases + WATCH LIST)
+|   +-- 10exec.md             # EXECUTE mode (stage loop + file drift detection)
+|   +-- 10review.md           # REVIEW mode (10-rule audit + profile match)
+|   +-- 10distill.md          # DISTILL mode (4 phases + 3-layer learning)
+|   +-- 10docs.md             # DOCS mode (Obsidian sync)
+|   +-- 10dev.md              # /10dev orchestrator logic
+|   +-- state-files.md        # Canonical state file schemas
++-- skills/
+|   +-- 10dev/                # /10dev entry point
+|   +-- 10plan/ ... 10profile/  # Per-mode slash command wrappers
++-- bin/
+|   +-- check-boundary.sh     # Rule 1 boundary guard
+|   +-- doc-health-audit.sh   # Document health check
+|   +-- doc-sync.sh           # Obsidian vault sync engine
++-- README.md / README.zh-CN.md / CONTRIBUTING.md / SECURITY.md
 ```
 
 ## When To Use It
@@ -186,7 +211,7 @@ echo "src/features/auth" > .10dev/boundary.txt
 - **Before coding** — scope the work, freeze contracts, plan stages
 - **During coding** — isolated stages with review loops and verification
 - **After coding** — audit PRs against 10 rules, extract principles
-- **Ongoing** — keep docs healthy, sync decisions to Obsidian
+- **Across projects** — developer profile carries your lessons forward
 
 ## When Not To Use It
 
@@ -208,6 +233,9 @@ Yes. The hook is optional. All rules work as agent instructions in `SKILL.md` al
 **What dependencies does it need?**
 Only `bash`, `grep`, `sed`. Standard on macOS and Linux. No npm, no pip, no Docker.
 
+**What's the developer profile?**
+A global file (`~/.10dev/developer-profile.md`) that tracks your recurring coding blind spots. `/10plan` reads it to warn you proactively. `/10distill` updates it. Fully optional — created automatically when you first run `/10distill`.
+
 **Can I modify it for my team?**
 Yes. MIT licensed. Preserve the core rules and adapt everything else.
 
@@ -215,6 +243,7 @@ Yes. MIT licensed. Preserve the core rules and adapt everything else.
 
 - No telemetry, analytics, or external services
 - No personal data required
+- Developer profile is local only (`~/.10dev/`)
 - All examples are generic
 - Safe to use in any organization
 
