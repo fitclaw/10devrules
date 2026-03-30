@@ -31,7 +31,19 @@ C) Defer — mark as tech debt for later
 - Run `git diff` to see what changed.
 - Self-review the diff against the stage's exit conditions.
 - If tests exist, run them.
-- If the diff touches files NOT in the stage's predicted file list, flag it.
+- Parse the current stage's `Files:` field from `todo.md` (comma-separated paths after `Files:`).
+- If `Files:` field exists: compare the diff's changed files against the predicted list. Flag any file NOT in the list:
+
+```
+File drift detected: {path} was modified but not in the stage's predicted file list.
+Rule 5: is this an intentional scope expansion or accidental coupling?
+
+A) Expected — update the stage's Files field
+B) Refactor — move this change to a separate stage
+C) Revert — this was accidental
+```
+
+- If no `Files:` field (legacy format): skip the file drift check for this stage.
 
 ### 4. Verify (Rule 9)
 

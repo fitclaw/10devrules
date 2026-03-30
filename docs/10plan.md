@@ -97,8 +97,14 @@ C) Show me the existing code for these interfaces
    - **Name**
    - **Entry condition** (what must be true before starting)
    - **Exit condition** (what must be true to call it done)
-   - **Files to touch** (predicted)
-2. Write stages as checkboxes to `todo.md` under `## Stages`.
+   - **Files to touch** (predicted, comma-separated)
+2. Write stages as checkboxes to `todo.md` under `## Stages`, using the canonical format:
+
+```
+- [ ] Stage N: {name} | Entry: {cond} | Exit: {cond} | Files: {path1, path2}
+```
+
+The `Files:` field is required. EXECUTE uses it to detect file drift (edits outside predicted files).
 
 ## Phase 5: Failure Path Audit (Rule 7)
 

@@ -12,10 +12,12 @@ Canonical formats for all state files used by 10devrules. Every reader/writer mu
 # Task Plan
 
 ## Stages
-- [ ] Stage 1: {name} | Entry: {condition} | Exit: {condition}
-- [ ] Stage 2: {name} | Entry: {condition} | Exit: {condition}
-- [x] Stage 3: {name} | Entry: {condition} | Exit: {condition}
+- [ ] Stage 1: {name} | Entry: {condition} | Exit: {condition} | Files: {path1, path2}
+- [ ] Stage 2: {name} | Entry: {condition} | Exit: {condition} | Files: {path3}
+- [x] Stage 3: {name} | Entry: {condition} | Exit: {condition} | Files: {path4, path5}
 ```
+
+The `Files:` field lists predicted files to touch (comma-separated). EXECUTE uses this to flag drift when the diff touches unexpected files. If a stage has no `Files:` field (legacy format), EXECUTE skips the file drift check for that stage.
 
 Created by: PLAN Phase 4. Updated by: EXECUTE (checkbox toggling).
 

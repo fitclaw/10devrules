@@ -141,7 +141,7 @@ MEDIUM: [pattern] — [defense]
 1. [foundation] -> 2. [consumer] -> 3. [integration]
 
 ## Stages (R4)
-- [ ] Stage 1: [name] | Entry: [cond] | Exit: [cond]
+- [ ] Stage 1: [name] | Entry: [cond] | Exit: [cond] | Files: [path1, path2]
 - [ ] Stage 2: ...
 
 ## Failure Paths (R7)
