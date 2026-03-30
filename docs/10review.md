@@ -4,7 +4,15 @@ Audit existing code, a PR, or completed work against all 10 rules.
 
 ## Procedure
 
-1. Read the diff (`git diff main...HEAD` or specified range) and any `todo.md`/plan files.
+1. Detect the base branch, then read the diff:
+   ```bash
+   _BASE=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+   [ -z "$_BASE" ] && git rev-parse --verify origin/main &>/dev/null && _BASE="main"
+   [ -z "$_BASE" ] && git rev-parse --verify origin/master &>/dev/null && _BASE="master"
+   [ -z "$_BASE" ] && _BASE="main"
+   echo "BASE: $_BASE"
+   ```
+   Read the diff (`git diff $_BASE...HEAD` or specified range) and any `todo.md`/plan files.
 2. Check each rule:
 
 | Rule | What to Check |

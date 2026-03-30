@@ -79,25 +79,49 @@ You:   /10review
 Agent: [Audits diff against all 10 rules]
        -> SHIP_WITH_CONCERNS: Rule 7 missing timeout handling on token refresh
 
+You:   /10distill
+Agent: [Extracts patterns, compares against developer profile]
+       -> 2 principles extracted. Profile updated: "Skips failure paths" frequency 2→3.
+
+You:   /10profile
+Agent: -> 3 blind spots tracked (1 HIGH, 2 MEDIUM). Pattern "Assumes platform behavior" healed.
+
 You:   /10docs
 Agent: [Scans todo.md, lessons.md, contracts for staleness]
        -> YELLOW: 3 stale tasks, 2 untagged lessons. Recommendation: run /10docs cleanup
 ```
 
+New to 10devrules? Start with `/10dev` — it guides you through setup and launches your first mode.
+
 ## Architecture: Router + Agent Cluster
 
-v2.1 uses a **router-layer architecture** — `SKILL.md` is a lightweight router (~250 lines) that dispatches to detailed mode files. The agent reads only what it needs.
+v2.2 uses a **router-layer architecture** with per-mode skill wrappers and a three-layer learning system.
 
 ```text
-SKILL.md (router)          docs/ (mode logic)           bin/ (enforcement)
+SKILL.md (router)          docs/ (mode logic)           skills/ (slash commands)
 ┌──────────────────┐      ┌─────────────────────┐      ┌────────────────────┐
-│ Rules table      │      │ 10plan.md           │      │ check-boundary.sh  │
-│ Mode router      │─────>│ 10exec.md           │      │ doc-health-audit.sh│
-│ Output templates │      │ 10review.md         │      │ doc-sync.sh        │
-│ Anti-patterns    │      │ 10distill.md        │      └────────────────────┘
-│ State files      │      │ 10docs.md           │
-└──────────────────┘      └─────────────────────┘
+│ Rules table      │      │ 10plan.md           │      │ 10dev/   (entry)   │
+│ Mode router      │─────>│ 10exec.md           │      │ 10plan/  10exec/   │
+│ Output templates │      │ 10review.md         │      │ 10review/ 10distill│
+│ Anti-patterns    │      │ 10distill.md        │      │ 10docs/ 10profile/ │
+│ State files      │      │ 10docs.md           │      └────────────────────┘
+│ Tool commands    │      │ 10dev.md            │      bin/ (enforcement)
+└──────────────────┘      │ state-files.md      │      ┌────────────────────┐
+                          └─────────────────────┘      │ check-boundary.sh  │
+                                                       │ doc-health-audit.sh│
+                                                       │ doc-sync.sh        │
+                                                       └────────────────────┘
 ```
+
+### Developer Profile (Three-Layer Learning)
+
+```text
+L0: Project lessons (lessons.md)     — what we learned THIS project
+L1: Developer blind spots (profile)  — recurring patterns across projects
+L2: Universal principles             — abstracted, project-independent
+```
+
+The profile lives at `~/.10dev/developer-profile.md` (global, cross-project). `/10plan` reads it to generate a WATCH LIST. `/10distill` updates it. `/10profile` views and manages it.
 
 ## DOCS Mode: Obsidian Integration
 

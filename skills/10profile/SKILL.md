@@ -19,7 +19,9 @@ View and manage your developer blind spots, preferences, and progress.
 ## Preamble (run first)
 
 ```bash
-_10DEV_ROOT="$(readlink ~/.claude/skills/ten-dev-rules 2>/dev/null)"
+_10DEV_ROOT="$(readlink ~/.claude/skills/ten-dev-rules 2>/dev/null || echo "")"
+[ -z "$_10DEV_ROOT" ] && [ -f "${CLAUDE_SKILL_DIR}/../../SKILL.md" ] && _10DEV_ROOT="$(cd "${CLAUDE_SKILL_DIR}/../.." && pwd)"
+[ -z "$_10DEV_ROOT" ] && _10DEV_ROOT="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
 echo "10DEV_ROOT: ${_10DEV_ROOT}"
 _HAS_PROFILE=$([ -f ~/.10dev/developer-profile.md ] && echo "yes" || echo "no")
 _HAS_PRINCIPLES=$([ -f ~/.10dev/universal-principles.md ] && echo "yes" || echo "no")

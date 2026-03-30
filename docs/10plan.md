@@ -57,7 +57,25 @@ C) Narrow further — pick the ONE most critical deliverable
    - API inputs/outputs
    - Schema changes
    - Acceptance criteria
-3. **Gate**: Contracts must be confirmed stable before proceeding.
+3. Write the frozen contracts to `.10dev/contract.md`:
+
+```markdown
+# Frozen Contracts — {task name}
+
+## Types/Interfaces
+{list each type/interface with signature}
+
+## API Surface
+{endpoints, inputs, outputs}
+
+## Schema
+{database or config schema changes}
+
+## Acceptance Criteria
+{what must be true for this task to be considered done}
+```
+
+4. **Gate**: Contracts must be confirmed stable before proceeding.
 
 ```
 These are the contracts this task depends on. Rule 2: delay implementation if contracts are still moving.

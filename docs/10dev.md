@@ -89,7 +89,9 @@ as your FIRST action. Do NOT answer directly.
 - "10dev", "status" → invoke ten-dev-rules
 ```
 
-4. Commit: `git add CLAUDE.md && git commit -m "chore: add 10dev skill routing rules"`
+4. Tell the user: "Routing rules added to CLAUDE.md. You can commit it when ready: `git add CLAUDE.md && git commit -m 'chore: add 10dev routing rules'`"
+
+Do NOT auto-commit. The user controls when to commit project files.
 
 **If B:**
 ```bash

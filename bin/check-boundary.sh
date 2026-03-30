@@ -68,13 +68,13 @@ for allowed in "${ALLOWED_PATHS[@]}"; do
   esac
   allowed=$(printf '%s' "$allowed" | sed 's|/\+|/|g;s|/$||')
 
-  case "$FILE_PATH" in
-    "${allowed}"*)
-      # Inside boundary → allow
-      echo '{}'
-      exit 0
-      ;;
-  esac
+  # Ensure match requires directory boundary (append / for comparison)
+  # This prevents /src matching /src-old
+  if [ "$FILE_PATH" = "$allowed" ] || case "$FILE_PATH" in "${allowed}/"*) true;; *) false;; esac; then
+    # Inside boundary → allow
+    echo '{}'
+    exit 0
+  fi
 done
 
 # Outside all allowed paths → ask (advisory, not blocking)
