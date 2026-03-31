@@ -5,6 +5,8 @@ description: Boundary-first, contract-first workflow for planning, restructuring
 
 # Ten Development Rules
 
+Use this skill when the work needs structure before execution: planning, restructuring, review, staged delivery, or turning project work into reusable engineering principles.
+
 ## Default Stance
 
 - Start from scope, not solution shape.
@@ -13,89 +15,59 @@ description: Boundary-first, contract-first workflow for planning, restructuring
 - Keep new complexity local until repeated pressure justifies abstraction.
 - Treat review, failure handling, and verification as part of delivery.
 
-## Workflow
+## Core Workflow
 
 1. Set the boundary.
-   - State what the task solves now.
-   - State what it does not solve now.
+   - State what the task solves now and what it does not solve now.
    - Remove adjacent ideas unless they block the current task.
-   - Tighten the scope before implementation if the task boundary is fuzzy.
 
 2. Freeze the contract.
-   - Define the types, statuses, routes, inputs or outputs, ownership, or acceptance criteria that other work depends on.
+   - Define the types, routes, statuses, inputs, outputs, ownership, or acceptance criteria that other work depends on.
    - Keep shared contracts in one obvious place.
-   - Delay broad implementation if the contract is still moving.
 
 3. Sequence by dependency.
-   - Build shared foundations before consumers.
-   - Let upper layers consume stable lower-layer behavior instead of inventing it.
+   - Build providers before consumers.
    - Parallelize only when contracts are stable and file ownership does not overlap.
 
 4. Stage the work.
-   - Split large tasks into phases with clear outputs and entry or exit conditions.
-   - Use stages such as contract, schema, service, route, UI, review, and verification when helpful.
-   - Prefer several small stage boundaries over one oversized feature pass.
+   - Split the task into phases with explicit outputs and entry or exit conditions.
+   - Prefer several small stage boundaries over one oversized implementation pass.
 
 5. Isolate new complexity.
-   - Put new domain logic in domain-specific files, modules, tables, or services.
+   - Keep new domain logic in domain-specific files, modules, tables, or services.
    - Protect shared core from speculative reuse.
-   - Abstract only after repeated pressure, not in anticipation.
 
 6. Build the review loop.
-   - Plan implementation, review, fix, and re-verification as one loop.
+   - Treat implementation, review, fixes, and re-verification as one loop.
    - Define how the change will be checked before calling it done.
-   - Update source-of-truth docs when the system meaning changes.
 
 7. Design failure paths.
    - Check timeouts, retries, rollback, idempotency, concurrency, auth, rate limits, and cost controls.
-   - Ask what happens when upstreams fail, inputs are partial, or operations race.
    - Treat unhappy paths as first-class behavior.
 
 8. Compress documentation.
-   - Write the minimum documentation that restores context quickly.
-   - Separate living specs from historical material.
+   - Write only the docs needed to restore current truth quickly.
    - Make the default reading order explicit when the repo contains legacy narratives.
 
 9. Verify reality.
-   - Prefer checks that can reveal real runtime behavior.
-   - Keep smoke tests honest; do not count expected failures as success.
+   - Prefer checks that reveal real runtime behavior.
    - Call out what was verified, what was skipped, and what still carries risk.
 
 10. Distill reusable principles.
     - Lift patterns out of feature names when summarizing work.
-    - Prefer verbs such as scope, freeze, sequence, stage, isolate, review, and verify.
     - End with a short formula the team can reuse.
 
 ## Response Shapes
 
-### Plan A Task
+- For planning, return: Boundary, Contract, Dependency order, Stages, Failure paths, Validation.
+- For review, check scope drift, contract drift, shared-core pollution, missing unhappy-path handling, misleading tests, and stale docs first.
+- For methodology distillation, extract short principles with why they matter and end with a reusable one-line summary.
 
-Return a short structure in this order:
+## Load References As Needed
 
-1. Boundary
-2. Contract
-3. Dependency order
-4. Stages
-5. Failure paths
-6. Validation
-
-### Review Existing Work
-
-Check these failure modes first:
-
-- Scope drift
-- Contract drift
-- Shared-core pollution
-- Missing unhappy-path handling
-- Missing verification or misleading tests
-- Docs that no longer match current truth
-
-### Distill Methodology From Concrete Work
-
-- Ignore feature names unless they are needed for clarity.
-- Convert repeated moves into named principles.
-- Keep each principle short: title plus why it matters.
-- End with a one-line summary formula.
+- Read [references/workflow.md](./references/workflow.md) for expanded guidance on sequencing, staging, failure handling, and verification.
+- Read [references/review-checklist.md](./references/review-checklist.md) for review heuristics and common failure modes.
+- Read [references/examples.md](./references/examples.md) for example prompts and output scaffolds.
 
 ## Anti-Patterns
 

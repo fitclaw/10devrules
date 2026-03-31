@@ -17,6 +17,10 @@ jobs:
             README.md
             README.zh-CN.md
             SKILL.md
+            agents/openai.yaml
+            references/examples.md
+            references/review-checklist.md
+            references/workflow.md
             LICENSE
             CONTRIBUTING.md
             SECURITY.md
@@ -34,3 +38,11 @@ jobs:
         run: |
           grep -q "^# Ten Development Rules" README.md
           grep -q "^# Ten Development Rules" README.zh-CN.md
+
+      - name: Verify skill metadata and reference links
+        run: |
+          grep -q "^name: ten-development-rules" SKILL.md
+          grep -q "^description:" SKILL.md
+          grep -q "references/workflow.md" SKILL.md
+          grep -q "references/review-checklist.md" SKILL.md
+          grep -q "references/examples.md" SKILL.md

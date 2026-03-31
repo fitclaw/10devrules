@@ -42,7 +42,7 @@ Before opening a pull request, check that:
 - The wording is still useful for both humans and AI agents
 - No private or identifying information has been introduced
 - Examples remain generic and safe to publish
-- The documentation stays consistent across `README.md`, `README.zh-CN.md`, and `SKILL.md`
+- The documentation stays consistent across `README.md`, `README.zh-CN.md`, `SKILL.md`, `agents/openai.yaml`, and `references/`
 
 ## Suggested Change Types
 

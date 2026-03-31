@@ -9,7 +9,7 @@
 
 一个面向软件开发团队与 AI 编码代理的通用工作方法 skill。
 
-`ten-development-rules` 是一份通用型 `SKILL.md`，核心目标是帮助使用者先收紧边界、先冻结契约、按依赖顺序推进实现、把新增复杂度局部化，并把评审与验证纳入交付闭环。
+`ten-development-rules` 现在按 Codex 可直接消费的 skill 仓库来组织，核心目标是帮助使用者先收紧边界、先冻结契约、按依赖顺序推进实现、把新增复杂度局部化，并把评审与验证纳入交付闭环。
 
 ## 目录
 
@@ -18,7 +18,9 @@
 - [它解决什么问题](#它解决什么问题)
 - [适用场景](#适用场景)
 - [不适用场景](#不适用场景)
+- [Codex 安装方式](#codex-安装方式)
 - [快速开始](#快速开始)
+- [Codex Skill 结构](#codex-skill-结构)
 - [示例提示词](#示例提示词)
 - [仓库结构](#仓库结构)
 - [隐私与开源发布](#隐私与开源发布)
@@ -73,6 +75,17 @@
 - 目标就是发散式头脑风暴，而不是收敛执行
 - 某些领域已经有更严格、不可替代的标准流程
 
+## Codex 安装方式
+
+如果你想把这个仓库直接作为本地 Codex skill 使用，可以把它放到 `~/.codex/skills/ten-development-rules`：
+
+```bash
+mkdir -p ~/.codex/skills
+git clone https://github.com/fitclaw/10devrules.git ~/.codex/skills/ten-development-rules
+```
+
+如果仓库已经克隆在别处，也可以通过复制或软链接的方式放到这个目录。
+
 ## 快速开始
 
 ### 方式一：作为独立 Skill 使用
@@ -80,12 +93,22 @@
 1. 保留仓库中的 `SKILL.md`。
 2. 在支持 markdown 指令的 AI 工作流中加载它。
 3. 在规划、评审、重构、实施时显式调用 `ten-development-rules`。
+4. 只有在需要更详细的工作流说明、评审清单或示例时，再读取 `references/`。
 
 ### 方式二：作为仓库级规范使用
 
 1. 把 `SKILL.md` 作为方法论源文件保留。
 2. 将其中适合你的部分引用到仓库级 AI 指令中。
 3. 保持核心规则不变，只调整示例、术语或领域化补充。
+
+## Codex Skill 结构
+
+这个仓库按渐进式加载来组织：
+
+- `SKILL.md` 放触发描述和最核心的工作规则，供 Codex 优先加载。
+- `agents/openai.yaml` 放技能展示元数据和默认提示词。
+- `references/` 放更详细的工作流说明、评审启发式清单和示例，按需读取。
+- `README.md` 与 `README.zh-CN.md` 主要服务于人类读者，而不是核心 skill 上下文。
 
 ## 示例提示词
 
@@ -98,13 +121,20 @@
 
 ```text
 .
+├── agents/
+│   └── openai.yaml
+├── references/
+│   ├── examples.md
+│   ├── review-checklist.md
+│   └── workflow.md
 ├── SKILL.md
 ├── README.md
 ├── README.zh-CN.md
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
 ├── SECURITY.md
-└── LICENSE
+├── LICENSE
+└── .github/
 ```
 
 ## 隐私与开源发布

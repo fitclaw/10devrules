@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ten Development Rules"
+  short_description: "Boundary-first engineering workflow"
+  default_prompt: "Use $ten-development-rules to scope and stage this task with explicit boundaries, contracts, dependency order, and validation."
+
+policy:
+  allow_implicit_invocation: true

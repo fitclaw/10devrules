@@ -9,7 +9,7 @@ English | [简体中文](./README.zh-CN.md)
 
 Boundary-first, contract-first guidance for software development teams and AI coding agents.
 
-`ten-development-rules` is a general-purpose `SKILL.md` that helps keep work scoped, contracts stable, dependencies ordered, new complexity isolated, and delivery closed with review plus verification.
+`ten-development-rules` is a Codex-ready skill repository. It helps keep work scoped, contracts stable, dependencies ordered, new complexity isolated, and delivery closed with review plus verification.
 
 ## Table of Contents
 
@@ -18,7 +18,9 @@ Boundary-first, contract-first guidance for software development teams and AI co
 - [What It Teaches](#what-it-teaches)
 - [When To Use It](#when-to-use-it)
 - [When Not To Use It](#when-not-to-use-it)
+- [Codex Installation](#codex-installation)
 - [Quick Start](#quick-start)
+- [Codex Skill Structure](#codex-skill-structure)
 - [Example Prompts](#example-prompts)
 - [Repository Structure](#repository-structure)
 - [Privacy And Publishing](#privacy-and-publishing)
@@ -78,6 +80,17 @@ This skill is intentionally general, but it should not be applied everywhere:
 - Open-ended ideation where loose exploration is the goal
 - Domains that already require a stricter formal process
 
+## Codex Installation
+
+To install this repository as a local Codex skill, place it under `~/.codex/skills/ten-development-rules`:
+
+```bash
+mkdir -p ~/.codex/skills
+git clone https://github.com/fitclaw/10devrules.git ~/.codex/skills/ten-development-rules
+```
+
+If you already cloned the repository elsewhere, copying or symlinking the folder into `~/.codex/skills/ten-development-rules` also works.
+
 ## Quick Start
 
 ### Option 1: Use It As A Standalone Skill
@@ -85,12 +98,22 @@ This skill is intentionally general, but it should not be applied everywhere:
 1. Keep `SKILL.md` in this repository or in your local skill collection.
 2. Load it into any agent workflow that can consume markdown-based instructions.
 3. Invoke it when planning, reviewing, restructuring, or executing software work.
+4. Let Codex read `references/` only when deeper workflow detail or examples are needed.
 
 ### Option 2: Use It As Repository Guidance
 
 1. Keep `SKILL.md` as the source of truth.
 2. Reference or adapt selected sections in your repo-level AI instructions.
 3. Preserve the core rules and customize only examples or domain-specific wording.
+
+## Codex Skill Structure
+
+This repository is organized for progressive disclosure:
+
+- `SKILL.md` contains the trigger description and the compact working rules Codex should load first.
+- `agents/openai.yaml` provides UI metadata and a default prompt for Codex skill surfaces.
+- `references/` contains deeper workflow guidance, review heuristics, and examples that should be read only when needed.
+- `README.md` and `README.zh-CN.md` are human-facing repository docs rather than core skill context.
 
 ## Example Prompts
 
@@ -103,13 +126,20 @@ This skill is intentionally general, but it should not be applied everywhere:
 
 ```text
 .
+├── agents/
+│   └── openai.yaml
+├── references/
+│   ├── examples.md
+│   ├── review-checklist.md
+│   └── workflow.md
 ├── SKILL.md
 ├── README.md
 ├── README.zh-CN.md
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
 ├── SECURITY.md
-└── LICENSE
+├── LICENSE
+└── .github/
 ```
 
 ## Privacy And Publishing

@@ -13,7 +13,7 @@ Briefly describe what changed and why.
 
 - [ ] I checked that the change keeps the skill general-purpose
 - [ ] I checked that no personal or private information was introduced
-- [ ] I reviewed `README.md`, `README.zh-CN.md`, and `SKILL.md` for consistency where applicable
+- [ ] I reviewed `README.md`, `README.zh-CN.md`, `SKILL.md`, `agents/openai.yaml`, and `references/` for consistency where applicable
 
 ## Notes
 
