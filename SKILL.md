@@ -5,6 +5,21 @@ description: Boundary-first, contract-first workflow for planning, restructuring
 
 # Ten Development Rules
 
+## Usage Compatibility
+
+If you came from the `/10` series, use the same style to keep UX consistent:
+- `/10 ...`  (preferred for backward compatibility)
+- `$ten-development-rules ...` (explicit skill call)
+- `Use ten-development-rules ...` (natural language)
+
+They all map to this skill. Keep the task intent in one sentence after the prefix.
+
+## Standard /10 Output Contract
+
+- Planning / restructuring / implementation mode: `Boundary`, `Contract`, `Dependency order`, `Stages`, `Failure paths`, `Validation`
+- Review mode: `Findings`, `Open questions`, `Priority fixes`, `Validation`
+- Distillation mode: `Principles`, `Summary formula`
+
 Use this skill when the work needs structure before execution: planning, restructuring, review, staged delivery, or turning project work into reusable engineering principles.
 
 ## Default Stance

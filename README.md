@@ -93,6 +93,12 @@ If you already cloned the repository elsewhere, copying or symlinking the folder
 
 ## Quick Start
 
+### Unified Trigger Style
+
+- `/10 ...` : keep the existing /10 series habit
+- `$ten-development-rules ...` : explicit skill invocation
+- `Use ten-development-rules ...` : natural language invocation
+
 ### Option 1: Use It As A Standalone Skill
 
 1. Keep `SKILL.md` in this repository or in your local skill collection.
@@ -117,10 +123,18 @@ This repository is organized for progressive disclosure:
 
 ## Example Prompts
 
-- "Use ten-development-rules to turn this feature request into a staged implementation plan."
-- "Review this PR with ten-development-rules and check for scope drift, contract drift, and missing failure handling."
-- "Restructure this migration into dependency-ordered phases using ten-development-rules."
-- "Summarize the lessons from this project as reusable principles with ten-development-rules."
+- "/10 Please use ten-development-rules to break this feature request into executable stages."
+- "/10 Review this PR with ten-development-rules and check for scope drift, contract drift, and missing failure handling."
+- "/10 需求梳理"
+- "/10 计划"
+- "/10 评审"
+- "/10 重构"
+- "/10 里程碑"
+- "/10 测试"
+- "/10 验证"
+- "/10 上线"
+- "/10 问题定位"
+- "/10 复盘"
 
 ## Repository Structure
 
