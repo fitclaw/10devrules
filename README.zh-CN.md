@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.md)
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.3.1-blue.svg)](./SKILL.md)
 
 [English](./README.md) | 简体中文
 
@@ -121,6 +121,21 @@ L2: 通用原则 (universal-principles) -> 抽象的、与项目无关的
 - **盲区治愈** — 6 个月未触发自动提议降级
 - **Distill diff** — 每次 /10distill 后展示画像变化
 - **画像导出** — 匿名化 markdown 可分享
+
+## Agent 行为规则
+
+10devrules 对 AI agent 强制执行 8 条行为规则，所有模式生效：
+
+1. 行动前先思考 — 写代码前先阅读现有文件
+2. 输出简洁，推理彻底
+3. 优先编辑而不是重写整个文件
+4. 不重复阅读已在上下文中的文件
+5. 宣布完成前先测试
+6. 不要有奉承的开场白或结束语
+7. 保持解决方案简单直接
+8. 用户指令始终覆盖 skill 指令
+
+这些规则在 `/10dev` 设置时注入项目 CLAUDE.md，在每个会话中生效 — 即使不在 10dev 模式下。
 
 ## 架构
 

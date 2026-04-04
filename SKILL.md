@@ -1,7 +1,7 @@
 ---
 name: ten-dev-rules
 preamble-tier: 2
-version: 2.3.0
+version: 2.3.1
 description: |
   Agent-driven development workflow using 10 rules as active decision gates.
   Five modes: PLAN, EXECUTE, REVIEW, DISTILL, DOCS.

@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.3.1-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -134,6 +134,21 @@ Features:
 - **Blind spot healing** — auto-propose severity downgrade after 6 months quiet
 - **Distill diff** — see what changed in your profile after each /10distill
 - **Profile export** — anonymized markdown for sharing
+
+## Agent Behavior Rules
+
+10devrules enforces 8 behavioral rules on the AI agent, active in every mode:
+
+1. Think before acting — read existing files before writing code
+2. Concise output, thorough reasoning
+3. Prefer editing over rewriting whole files
+4. Do not re-read files already in context
+5. Test before declaring done
+6. No sycophantic openers or closing fluff
+7. Keep solutions simple and direct
+8. User instructions always override skill instructions
+
+These are injected into your project's CLAUDE.md during `/10dev` setup, so they apply to every session — even outside 10dev modes.
 
 ## Architecture
 
