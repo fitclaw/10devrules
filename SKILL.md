@@ -4,10 +4,13 @@ preamble-tier: 2
 version: 2.3.1
 description: |
   Agent-driven development workflow using 10 rules as active decision gates.
-  Five modes: PLAN, EXECUTE, REVIEW, DISTILL, DOCS.
-  Commands: /10plan, /10exec, /10review, /10distill, /10docs.
+  Five work modes: PLAN, EXECUTE, REVIEW, DISTILL, DOCS.
+  Two tool commands: /10dev (orchestrator), /10profile (developer profile viewer).
+  Commands: /10dev, /10plan, /10exec, /10review, /10distill, /10docs, /10profile.
+  Three-layer learning: L0 project lessons, L1 developer blind spots, L2 universal principles.
   Use when asked to "plan a feature", "start a task", "review this code", "what did we learn",
-  "sync docs", "doc health", "clean up docs", or any development work that benefits from structured scoping.
+  "sync docs", "doc health", "clean up docs", "my blind spots", "10dev status",
+  or any development work that benefits from structured scoping.
   Proactively suggest when user starts coding without scoping, skips failure path design, or
   marks work done without verification.
 allowed-tools:
@@ -261,6 +264,8 @@ The agent uses these files to maintain state across sessions. All are optional â
 | `~/.10dev/projects.txt` | Global registry of known project paths | PLAN Phase 0 |
 | `~/.10dev/.onboarded` | Global onboarding flag | /10dev Phase 1 |
 | `~/.10dev/.routing_declined` | User declined CLAUDE.md routing | /10dev Phase 2 |
+
+For canonical file formats and examples, see `docs/state-files.md`.
 
 ---
 
