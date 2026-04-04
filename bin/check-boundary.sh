@@ -50,14 +50,17 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-# Resolve to absolute path
+# Resolve to absolute path and canonicalize (handles ../ traversal)
 case "$FILE_PATH" in
   /*) ;;
   *) FILE_PATH="$(pwd)/$FILE_PATH" ;;
 esac
+FILE_PATH=$(realpath -m "$FILE_PATH" 2>/dev/null || printf '%s' "$FILE_PATH" | sed 's|/\+|/|g;s|/$||')
 
-# Normalize: remove double slashes and trailing slash
-FILE_PATH=$(printf '%s' "$FILE_PATH" | sed 's|/\+|/|g;s|/$||')
+# Always allow writes to .10dev/ state files (boundary.txt, contract.md, etc.)
+case "$FILE_PATH" in
+  */.10dev/*) echo '{}'; exit 0 ;;
+esac
 
 # Check: does the file path start with any allowed path?
 for allowed in "${ALLOWED_PATHS[@]}"; do
@@ -66,7 +69,7 @@ for allowed in "${ALLOWED_PATHS[@]}"; do
     /*) ;;
     *) allowed="$(pwd)/$allowed" ;;
   esac
-  allowed=$(printf '%s' "$allowed" | sed 's|/\+|/|g;s|/$||')
+  allowed=$(realpath -m "$allowed" 2>/dev/null || printf '%s' "$allowed" | sed 's|/\+|/|g;s|/$||')
 
   # Ensure match requires directory boundary (append / for comparison)
   # This prevents /src matching /src-old

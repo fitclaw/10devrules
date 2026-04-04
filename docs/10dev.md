@@ -70,7 +70,7 @@ B) No thanks, I'll type /10xxx commands manually
 
 **If A:**
 1. Create CLAUDE.md if it doesn't exist.
-2. Check idempotency: `grep -q "## Skill routing — 10dev" CLAUDE.md`. If found, skip.
+2. Check idempotency: `grep -q "## Skill routing" CLAUDE.md`. If found (any routing section, including from gstack or other tools), skip.
 3. Append routing + behavior block:
 
 ```markdown

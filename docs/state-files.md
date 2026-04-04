@@ -97,7 +97,7 @@ Created by: DOCS first-run setup.
 ```markdown
 ---
 developer: vtx
-updated: 2026-03-30
+updated: 2026-03-30T15:42:00
 version: 1
 pattern_count: 2
 ---

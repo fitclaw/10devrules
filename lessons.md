@@ -38,3 +38,26 @@ PLAN wrote "Files to touch" but todo.md had no field for it. EXECUTE needed it b
 
 ## Phase Complete: codex6-stage-format (2026-03-30)
 
+## Principles (v2.3.1 eng review cycle, 2026-04-04)
+
+### 10. Extract shared detection to one file
+When the same detection logic appears in 7 files, the first bug fix requires 7 edits. DRY applies to prompt files just as much as code. Extract early, not after the pattern is established.
+
+### 11. Document behavior, not aspiration
+"Hook blocks out-of-scope edits" described what we wished the hook did, not what it actually did (advisory ask). Documentation that overstates capability erodes trust faster than missing docs.
+
+### 12. Canonicalize paths before comparing
+Prefix-based path checking without `realpath` is bypassable via `../` traversal. Security-sensitive string comparisons need normalized inputs.
+
+### 13. Exempt internal state from guard rules
+A boundary guard that blocks writes to its own config files creates a deadlock. Internal state (.10dev/) should always be whitelisted.
+
+### 14. Version strings drift between locations
+YAML frontmatter said v2.3.1 while the markdown heading said v2.1. Any value that appears in two places will eventually disagree. Either automate derivation or add a smoke test.
+
+---
+
+**Formula (eng review):** extract the shared, document the real, canonicalize before compare, exempt internal state, test for drift.
+
+## Phase Complete: eng-review-v2.3.1 (2026-04-04)
+

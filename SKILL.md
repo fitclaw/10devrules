@@ -1,13 +1,15 @@
 ---
 name: ten-dev-rules
 preamble-tier: 2
-version: 2.3.1
+version: 2.4.0
 description: |
   Agent-driven development workflow using 10 rules as active decision gates.
-  Five work modes: PLAN, EXECUTE, REVIEW, DISTILL, DOCS.
+  Five work modes: PLAN, EXECUTE (env-aware + auto code review), REVIEW (self-check gate + deep review), DISTILL, DOCS.
   Two tool commands: /10dev (orchestrator), /10profile (developer profile viewer).
   Commands: /10dev, /10plan, /10exec, /10review, /10distill, /10docs, /10profile.
   Three-layer learning: L0 project lessons, L1 developer blind spots, L2 universal principles.
+  /10exec detects test frameworks, runs tests/lint/types, and reviews code at each stage.
+  /10review auto-triggers deep code review when compliance audit lacks file:line evidence.
   Use when asked to "plan a feature", "start a task", "review this code", "what did we learn",
   "sync docs", "doc health", "clean up docs", "my blind spots", "10dev status",
   or any development work that benefits from structured scoping.
@@ -37,7 +39,7 @@ hooks:
           statusMessage: "Rule 1: Checking scope boundary..."
 ---
 
-# Ten Development Rules — Agent Skill v2.1
+# Ten Development Rules — Agent Skill v2.4.0
 
 An active agent cluster that uses 10 rules as decision gates. Each mode's detailed logic lives in `docs/` — read on demand.
 
@@ -69,7 +71,7 @@ These rules are not passive advice. Each rule is a **decision gate** enforced at
 
 | # | Rule | Agent Behavior |
 |---|------|----------------|
-| 1 | **Set the boundary** | Must define solves/defers/removed BEFORE any implementation. Hook blocks out-of-scope edits. |
+| 1 | **Set the boundary** | Must define solves/defers/removed BEFORE any implementation. Hook flags out-of-scope edits. |
 | 2 | **Freeze the contract** | Must stabilize interfaces before consumers are built. Gate: unstable contract blocks Phase 3. |
 | 3 | **Sequence by dependency** | Must build foundations before consumers. Circular deps require user resolution. |
 | 4 | **Stage the work** | Must split into phases with entry/exit conditions. No single oversized pass allowed. |
@@ -172,14 +174,32 @@ MEDIUM: [pattern] — [defense]
 
 ```
 STAGE COMPLETE: [name]
-━━━━━━━━━━━━━━━━━━━━━
-Rule 5 (Isolate):  [new files created / shared code status]
-Rule 6 (Review):   [self-review summary]
-Rule 9 (Verify):
-  Verified: [what was checked]
-  Skipped:  [what was not checked and why]
-  Risk:     [remaining unknowns]
-━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━
+Rule 5 (Isolate):  [new files / shared code status — cite file:line]
+Verification:
+  Tests:  [X passed, Y failed / not available]
+  Lint:   [X warnings, Y errors / not available]
+  Types:  [X errors / not available]
+Stage Review:
+  R5:   [PASS / SHARED-CORE-TOUCHED]
+  R7:   [PASS / MISSING — cite function]
+  R9:   [PASS / GAP — cite untested path]
+  Code: [P1: X, P2: Y, P3: Z / clean]
+  Verdict: CONTINUE
+━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### EXECUTE Summary (all stages done)
+
+```
+10 DEV RULES: EXECUTION SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stages: [N] completed, [M] self-corrections
+Tests:  [total pass/fail]
+Findings: P1: [X], P2: [Y], P3: [Z]
+Commits: [N] atomic commits
+Next: /10review → /10distill
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### REVIEW Report
@@ -187,18 +207,28 @@ Rule 9 (Verify):
 ```
 10 DEV RULES: REVIEW REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Rule 1  - Boundary:      PASS | DRIFT | VIOLATION
-Rule 2  - Contract:      PASS | UNSTABLE | VIOLATION
-Rule 3  - Dependency:    PASS | MISORDERED | VIOLATION
-Rule 4  - Staging:       PASS | OVERSIZED | N/A
-Rule 5  - Isolation:     PASS | SHARED-CORE-TOUCHED | VIOLATION
-Rule 6  - Review Loop:   PASS | INCOMPLETE | VIOLATION
-Rule 7  - Failure Paths: PASS | MISSING | VIOLATION
-Rule 8  - Documentation: PASS | STALE | VIOLATION
-Rule 9  - Verification:  PASS | CEREMONIAL | VIOLATION
-Rule 10 - Distillation:  PASS | SKIPPED | N/A
+Rule 1  - Boundary:      PASS | DRIFT | VIOLATION    [file:line evidence]
+Rule 2  - Contract:      PASS | UNSTABLE | VIOLATION  [evidence]
+Rule 3  - Dependency:    PASS | MISORDERED | VIOLATION [evidence]
+Rule 4  - Staging:       PASS | OVERSIZED | N/A        [evidence]
+Rule 5  - Isolation:     PASS | SHARED-CORE-TOUCHED    [evidence]
+Rule 6  - Review Loop:   PASS | INCOMPLETE | VIOLATION [evidence]
+Rule 7  - Failure Paths: PASS | MISSING | VIOLATION    [evidence]
+Rule 8  - Documentation: PASS | STALE | VIOLATION      [evidence]
+Rule 9  - Verification:  PASS | CEREMONIAL | VIOLATION [evidence]
+Rule 10 - Distillation:  PASS | SKIPPED | N/A          [evidence]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Self-check: PASSED | TRIGGERED (deep review below)
+
+## Code Review (if self-check triggered)
+[P1] (confidence: N/10) file:line — description
+[P2] ...
+
+## Profile Match (if findings match blind spots)
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Verdict: SHIP | SHIP_WITH_CONCERNS | BLOCK
+Code review: {N} findings (P1: X, P2: Y, P3: Z) | skipped
 ```
 
 ### DISTILL Output
@@ -242,6 +272,7 @@ The agent watches for these and intervenes when detected:
 | Consumer-driven contracts | Consumer is defining interfaces that providers haven't stabilized | Block with Rule 2: freeze the contract from provider side |
 | Premature abstraction | User wants to abstract because two things "look similar" | Challenge with Rule 5: abstract only after repeated pressure |
 | Ceremonial review | "LGTM" with no substantive check | Reject with Rule 6: define how the change was actually checked |
+| Shallow compliance audit | All PASS with no file:line evidence | Self-check gate triggers deep code review automatically |
 | History-preserving docs | Documentation preserves old narrative but hides current truth | Flag with Rule 8: separate living specs from history |
 | Verification theater | Tests exist but don't test real behavior | Flag with Rule 9: prefer checks that reveal real runtime behavior |
 

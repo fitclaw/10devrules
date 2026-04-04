@@ -34,9 +34,9 @@ For each new L0 lesson extracted in Phase 1:
 
 1. **Keyword match (deterministic)**: Read each blind spot's `Keywords` field. If the L0 lesson text contains 2+ keywords from any blind spot, it's a match.
 2. **Agent judgment (fallback)**: If no keyword match, but the agent judges the lesson describes the same category of mistake as an existing blind spot, flag it as a potential match.
-3. **On match**:
-   - Increment the blind spot's `Frequency` by 1 (once per /10distill run, not per lesson).
-   - Update `Last seen` to today's date.
+3. **On match** (maintain a `matched_spots` set during this run to track which blind spots have already been incremented — skip increment if already in the set):
+   - Increment the blind spot's `Frequency` by 1 (once per /10distill run, not per lesson). Add to `matched_spots`.
+   - Update `Last seen` to today's date (ISO 8601 with seconds, e.g., `2026-03-30T15:42:00`).
    - Add current project name to `Projects` list (if not already present).
    - Inform the user: "Updated blind spot '{name}': frequency {N-1} → {N}."
 4. **On no match but recurring signal**: If the agent judges a lesson could become a recurring pattern (it describes a category of mistake, not a one-off), propose to the user:
@@ -112,7 +112,7 @@ cp ~/.10dev/developer-profile.md ~/.10dev/developer-profile.md.bak 2>/dev/null
 mv ~/.10dev/developer-profile.md.tmp ~/.10dev/developer-profile.md
 ```
 
-**Conflict detection**: Before writing, compare the `updated` field in YAML frontmatter against what was read at Step 1. If it changed (another session updated the profile), re-read the file, merge changes (add new entries, take the higher frequency for existing entries), then write again.
+**Conflict detection**: Before writing, compare the `updated` field in YAML frontmatter against what was read at Step 1. The `updated` field uses ISO 8601 with seconds (e.g., `2026-03-30T15:42:00`). If it changed (another session updated the profile), re-read the file, merge changes (add new entries, take the higher frequency for existing entries), then write again.
 
 ### Step 6: Distill diff
 

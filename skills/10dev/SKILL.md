@@ -24,10 +24,10 @@ Environment manager and onboarding for 10 Development Rules.
 ## Preamble (run first)
 
 ```bash
-_10DEV_ROOT="$(readlink ~/.claude/skills/ten-dev-rules 2>/dev/null || echo "")"
-[ -z "$_10DEV_ROOT" ] && [ -f "${CLAUDE_SKILL_DIR}/../../SKILL.md" ] && _10DEV_ROOT="$(cd "${CLAUDE_SKILL_DIR}/../.." && pwd)"
-[ -z "$_10DEV_ROOT" ] && _10DEV_ROOT="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
-echo "10DEV_ROOT: ${_10DEV_ROOT}"
+source "${CLAUDE_SKILL_DIR}/../../bin/detect-root.sh" 2>/dev/null || {
+  _10DEV_ROOT="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
+  echo "10DEV_ROOT: ${_10DEV_ROOT}"
+}
 
 # Global state
 _ONBOARDED=$([ -f ~/.10dev/.onboarded ] && echo "yes" || echo "no")
@@ -45,7 +45,7 @@ _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 
 # CLAUDE.md routing
 _HAS_ROUTING="no"
-[ -f CLAUDE.md ] && grep -q "## Skill routing — 10dev" CLAUDE.md 2>/dev/null && _HAS_ROUTING="yes"
+[ -f CLAUDE.md ] && grep -q "## Skill routing" CLAUDE.md 2>/dev/null && _HAS_ROUTING="yes"
 
 echo "ONBOARDED: $_ONBOARDED | PROFILE: $_HAS_PROFILE | PROJECTS: $_PROJECT_COUNT"
 echo "PROJECT_10DEV: $_HAS_10DEV | BOUNDARY: $_HAS_BOUNDARY | TODO: $_HAS_TODO | LESSONS: $_HAS_LESSONS"

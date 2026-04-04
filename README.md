@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Version](https://img.shields.io/badge/version-2.3.1-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -28,8 +28,8 @@ AI coding assistants are powerful but undisciplined. Without guardrails, they:
 |---------|------|-------------|
 | `/10dev` | Entry | Onboarding, project scan, status dashboard |
 | `/10plan` | Mode | Scope boundary -> freeze contracts -> sequence deps -> stage work -> WATCH LIST |
-| `/10exec` | Mode | Isolate complexity -> implement -> review loop -> verify -> record lessons |
-| `/10review` | Mode | Audit code/PR against all 10 rules -> SHIP / BLOCK verdict + profile match |
+| `/10exec` | Mode | Detect env -> implement -> run tests/lint -> stage code review -> atomic commit |
+| `/10review` | Mode | 10-rule audit + self-check gate + deep code review -> SHIP / BLOCK verdict |
 | `/10distill` | Mode | Extract principles -> update developer profile -> cross-project pattern detection |
 | `/10docs` | Mode | Audit doc health -> cleanup stale artifacts -> sync to Obsidian vault |
 | `/10profile` | Tool | View/manage developer blind spots, preferences, and progress |
@@ -42,7 +42,7 @@ All modes also trigger via natural language: "plan this feature", "review this P
 
 | # | Rule | What the Agent Does |
 |---|------|---------------------|
-| 1 | **Set the boundary** | Defines solves/defers/removed. Hook blocks out-of-scope edits. |
+| 1 | **Set the boundary** | Defines solves/defers/removed. Hook flags out-of-scope edits. |
 | 2 | **Freeze the contract** | Stabilizes interfaces before consumers are built. Writes `.10dev/contract.md`. |
 | 3 | **Sequence by dependency** | Builds foundations first. Flags circular deps for resolution. |
 | 4 | **Stage the work** | Splits into phases with entry/exit conditions and predicted file lists. |
@@ -84,12 +84,12 @@ Agent: [Sets boundary, freezes contracts, sequences deps, stages work, shows WAT
        -> Structured plan with 4 stages, frozen contracts, failure paths, and profile warnings
 
 You:   /10exec
-Agent: [For each stage: isolate -> implement -> review -> verify -> update]
-       -> Code delivered with file drift detection and verification records
+Agent: [Detects test framework, implements each stage, runs tests+lint, auto-reviews code]
+       -> Stage 1 complete. Tests: 6/6. Stage review: R5 PASS, R7 PASS, R9 PASS. Verdict: CONTINUE
 
 You:   /10review
-Agent: [Audits diff against all 10 rules, matches findings against profile]
-       -> SHIP_WITH_CONCERNS: Rule 7 missing timeout handling. Profile match: known blind spot.
+Agent: [10-rule audit + self-check gate + deep code review per file]
+       -> SHIP_WITH_CONCERNS: [P2] check-boundary.sh:42 — realpath not available on macOS
 
 You:   /10distill
 Agent: [Extracts patterns, compares against developer profile]
@@ -135,6 +135,18 @@ Features:
 - **Distill diff** — see what changed in your profile after each /10distill
 - **Profile export** — anonymized markdown for sharing
 
+## What's New in v2.4
+
+**Real code review in /10review.** The old review was a 10-rule compliance checklist. Now it has a self-check gate: if the agent gives PASS without citing specific `file:line` evidence, it auto-triggers a deep code review (logic, security, boundary conditions, error handling). P1 findings block shipping.
+
+**Environment-aware /10exec.** Detects your test framework (jest/vitest/pytest/go/cargo/shell), linter, and type checker at startup. Runs them after every stage with concrete pass/fail numbers. No more "tests pass" without actually running tests.
+
+**Stage-level code review.** After each stage, /10exec runs a focused review (R5 Isolation + R7 Failure Paths + R9 Verification + deep code review). P1 findings auto-block and trigger self-correction. Full /10review recommended after all stages complete.
+
+**Shared tooling.** `bin/detect-root.sh` (project root detection with glob fallback) and `bin/detect-env.sh` (environment detection) extracted as shared scripts. DRY across 7 skill shims.
+
+**Boundary guard improvements.** `realpath` canonicalization prevents `../` path traversal. `.10dev/` state files exempted from boundary checks.
+
 ## Agent Behavior Rules
 
 10devrules enforces 8 behavioral rules on the AI agent, active in every mode:
@@ -152,7 +164,7 @@ These are injected into your project's CLAUDE.md during `/10dev` setup, so they 
 
 ## Architecture
 
-v2.3 uses a **router-layer architecture** with per-mode skill wrappers.
+v2.4 uses a **router-layer architecture** with per-mode skill wrappers, real code review, and environment-aware execution.
 
 ```text
 SKILL.md (router)          docs/ (mode logic)           skills/ (slash commands)
@@ -202,7 +214,7 @@ The optional boundary guard hook enforces Rule 1:
 
 ```text
 .
-+-- SKILL.md                  # Router layer (v2.3)
++-- SKILL.md                  # Router layer (v2.4)
 +-- docs/
 |   +-- 10plan.md             # PLAN mode (7 phases + WATCH LIST)
 |   +-- 10exec.md             # EXECUTE mode (stage loop + file drift detection)

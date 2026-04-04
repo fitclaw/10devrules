@@ -35,10 +35,10 @@ Shortcut into Ten Development Rules **REVIEW** mode.
 ## Preamble (run first)
 
 ```bash
-_10DEV_ROOT="$(readlink ~/.claude/skills/ten-dev-rules 2>/dev/null || echo "")"
-[ -z "$_10DEV_ROOT" ] && [ -f "${CLAUDE_SKILL_DIR}/../../SKILL.md" ] && _10DEV_ROOT="$(cd "${CLAUDE_SKILL_DIR}/../.." && pwd)"
-[ -z "$_10DEV_ROOT" ] && _10DEV_ROOT="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
-echo "10DEV_ROOT: ${_10DEV_ROOT}"
+source "${CLAUDE_SKILL_DIR}/../../bin/detect-root.sh" 2>/dev/null || {
+  _10DEV_ROOT="$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)"
+  echo "10DEV_ROOT: ${_10DEV_ROOT}"
+}
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 _HAS_BOUNDARY=$([ -f .10dev/boundary.txt ] && echo "yes" || echo "no")
 _HAS_TODO=$([ -f todo.md ] && echo "yes" || echo "no")
