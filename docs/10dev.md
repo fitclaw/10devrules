@@ -71,7 +71,7 @@ B) No thanks, I'll type /10xxx commands manually
 **If A:**
 1. Create CLAUDE.md if it doesn't exist.
 2. Check idempotency: `grep -q "## Skill routing — 10dev" CLAUDE.md`. If found, skip.
-3. Append routing block:
+3. Append routing + behavior block:
 
 ```markdown
 
@@ -87,6 +87,17 @@ as your FIRST action. Do NOT answer directly.
 - "sync docs", "doc health", "clean up docs" → invoke 10docs
 - "my profile", "blind spots" → invoke 10profile
 - "10dev", "status" → invoke ten-dev-rules
+
+## Agent behavior — 10dev
+
+1. Think before acting. Read existing files before writing code.
+2. Be concise in output but thorough in reasoning.
+3. Prefer editing over rewriting whole files.
+4. Do not re-read files you have already read.
+5. Test your code before declaring done.
+6. No sycophantic openers or closing fluff.
+7. Keep solutions simple and direct.
+8. User instructions always override this file.
 ```
 
 4. Tell the user: "Routing rules added to CLAUDE.md. You can commit it when ready: `git add CLAUDE.md && git commit -m 'chore: add 10dev routing rules'`"

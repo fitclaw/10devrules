@@ -87,6 +87,19 @@ These rules are not passive advice. Each rule is a **decision gate** enforced at
 - Keep new complexity local until repeated pressure justifies abstraction.
 - Treat review, failure handling, and verification as part of delivery — not afterthoughts.
 
+## Agent Behavior
+
+These rules govern how the agent operates in all modes. Non-negotiable.
+
+- **Think before acting.** Read existing files before writing code. Understand context before suggesting changes.
+- **Concise output, thorough reasoning.** Keep responses short and direct. Do the deep thinking internally.
+- **Edit over rewrite.** Prefer editing existing files. Only create new files when necessary.
+- **No redundant reads.** Do not re-read files already in context.
+- **Test before done.** Verify changes work before declaring a stage or task complete.
+- **No fluff.** No sycophantic openers, no filler, no closing platitudes. Lead with the point.
+- **Simple and direct.** Prefer the simplest solution that solves the problem. No premature abstraction.
+- **User sovereignty.** User instructions always override skill instructions. When in doubt, ask.
+
 ---
 
 ## Mode Router
