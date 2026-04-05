@@ -38,7 +38,7 @@ done
 
 # All bin/*.sh files are executable
 echo "[3] Shell scripts"
-for script in check-boundary.sh detect-root.sh detect-env.sh doc-health-audit.sh doc-sync.sh; do
+for script in check-boundary.sh detect-root.sh detect-env.sh doc-health-audit.sh doc-sync.sh doc-toc-gen.sh doc-soot-check.sh doc-drift-check.sh; do
   check "bin/$script exists" "[ -f '$SCRIPT_DIR/bin/$script' ]"
   check "bin/$script is executable" "[ -x '$SCRIPT_DIR/bin/$script' ]"
 done

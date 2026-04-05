@@ -1,7 +1,7 @@
 ---
 name: ten-dev-rules
 preamble-tier: 2
-version: 2.4.0
+version: 2.5.0
 description: |
   Agent-driven development workflow using 10 rules as active decision gates.
   Five work modes: PLAN, EXECUTE (env-aware + auto code review), REVIEW (self-check gate + deep review), DISTILL, DOCS.
@@ -39,7 +39,7 @@ hooks:
           statusMessage: "Rule 1: Checking scope boundary..."
 ---
 
-# Ten Development Rules — Agent Skill v2.4.0
+# Ten Development Rules — Agent Skill v2.5.0
 
 An active agent cluster that uses 10 rules as decision gates. Each mode's detailed logic lives in `docs/` — read on demand.
 
@@ -244,20 +244,22 @@ Formula: [one-line summary]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### DOCS Health Report
+### DOCS Governance Report
 
 ```
-DOC-SYNC: HEALTH AUDIT
-━━━━━━━━━━━━━━━━━━━━━━
-Project: {name} | Phase: {detected}
+/10docs — DOCUMENT GOVERNANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Project: {name} | CLAUDE.md: {N} lines (target: <100)
 
-todo.md:      {N} stale tasks
-lessons.md:   {N} untagged / {N} total
-contract.md:  {N} drifted interfaces
-orphaned:     {list}
-━━━━━━━━━━━━━━━━━━━━━━
-Health: GREEN | YELLOW | RED
-Recommendation: {action}
+UPDATED ({N}): ✏️ drift fixes (broken links, stale refs, missing docs)
+DELETE ({N}):  ✂ duplicates between L1↔L2
+TOC ({N}):     📑 files >200 lines missing ## 目录
+ARCHIVE ({N}): 📦 stale/one-time docs
+EXTRACT ({N}): 📤 long blocks → new docs + index
+
+AI Friendliness: {score}/5
+Apply cleanup? [Y/n]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---

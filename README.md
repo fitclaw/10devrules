@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -31,7 +31,7 @@ AI coding assistants are powerful but undisciplined. Without guardrails, they:
 | `/10exec` | Mode | Detect env -> implement -> run tests/lint -> stage code review -> atomic commit |
 | `/10review` | Mode | 10-rule audit + self-check gate + deep code review -> SHIP / BLOCK verdict |
 | `/10distill` | Mode | Extract principles -> update developer profile -> cross-project pattern detection |
-| `/10docs` | Mode | Audit doc health -> cleanup stale artifacts -> sync to Obsidian vault |
+| `/10docs` | Mode | Auto-fix stale docs -> delete duplicates -> generate TOCs -> archive -> sync vault |
 | `/10profile` | Tool | View/manage developer blind spots, preferences, and progress |
 
 All modes also trigger via natural language: "plan this feature", "review this PR", "what did we learn", etc.
@@ -99,8 +99,8 @@ You:   /10profile
 Agent: -> 3 blind spots tracked (1 HIGH, 2 MEDIUM). Last healed: "Assumes platform behavior".
 
 You:   /10docs
-Agent: [Scans todo.md, lessons.md, contracts for staleness]
-       -> GREEN: All documents healthy. 0 stale tasks.
+Agent: [Scans all docs, fixes drift, builds cleanup plan]
+       -> UPDATED: 2 broken links fixed, 1 missing doc created. DELETE 3, TOC 2, ARCHIVE 1. Apply? [Y/n]
 ```
 
 ## Developer Profile: Three-Layer Learning
@@ -135,17 +135,21 @@ Features:
 - **Distill diff** — see what changed in your profile after each /10distill
 - **Profile export** — anonymized markdown for sharing
 
-## What's New in v2.4
+## What's New in v2.5
 
-**Real code review in /10review.** The old review was a 10-rule compliance checklist. Now it has a self-check gate: if the agent gives PASS without citing specific `file:line` evidence, it auto-triggers a deep code review (logic, security, boundary conditions, error handling). P1 findings block shipping.
+**Automated document governance (/10docs).** Completely rewritten as a single-command pipeline: SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY. The UPDATE phase auto-fixes broken links, documents undocumented directories, and updates stale references *before* cleanup begins. One confirmation applies all structural changes.
 
-**Environment-aware /10exec.** Detects your test framework (jest/vitest/pytest/go/cargo/shell), linter, and type checker at startup. Runs them after every stage with concrete pass/fail numbers. No more "tests pass" without actually running tests.
+**Documentation drift detection.** New `bin/doc-drift-check.sh` finds broken pointers, undocumented source directories, stale CLAUDE.md references, README version drift, missing standard docs, and code that changed without doc updates.
 
-**Stage-level code review.** After each stage, /10exec runs a focused review (R5 Isolation + R7 Failure Paths + R9 Verification + deep code review). P1 findings auto-block and trigger self-correction. Full /10review recommended after all stages complete.
+**Single Source of Truth enforcement.** New `bin/doc-soot-check.sh` detects duplicate definitions across markdown files with an authority hierarchy for resolution.
 
-**Shared tooling.** `bin/detect-root.sh` (project root detection with glob fallback) and `bin/detect-env.sh` (environment detection) extracted as shared scripts. DRY across 7 skill shims.
+**Auto-TOC generation.** Files >200 lines automatically get a `## 目录` (Table of Contents) via `bin/doc-toc-gen.sh`. AI reads the TOC to locate sections by line number.
 
-**Boundary guard improvements.** `realpath` canonicalization prevents `../` path traversal. `.10dev/` state files exempted from boundary checks.
+**AI Friendliness score.** `/10docs audit` reports a 0-5 score: CLAUDE.md size, duplication, TOC coverage, archive leaks, and context sufficiency.
+
+### v2.4 highlights
+
+Real code review in /10review (self-check gate + deep review). Environment-aware /10exec (auto-detects test frameworks). Stage-level code review. Shared tooling (`detect-root.sh`, `detect-env.sh`). Boundary guard improvements.
 
 ## Agent Behavior Rules
 
@@ -164,7 +168,7 @@ These are injected into your project's CLAUDE.md during `/10dev` setup, so they 
 
 ## Architecture
 
-v2.4 uses a **router-layer architecture** with per-mode skill wrappers, real code review, and environment-aware execution.
+v2.5 uses a **router-layer architecture** with per-mode skill wrappers, real code review, environment-aware execution, and automated document governance.
 
 ```text
 SKILL.md (router)          docs/ (mode logic)           skills/ (slash commands)
@@ -174,10 +178,13 @@ SKILL.md (router)          docs/ (mode logic)           skills/ (slash commands)
 | Output templates|       | 10review.md        |       | 10review/ 10distill|
 | Anti-patterns   |       | 10distill.md       |       | 10docs/ 10profile/ |
 | State files     |       | 10docs.md          |       +--------------------+
-| Tool commands   |       | 10dev.md           |       bin/ (enforcement)
+| Tool commands   |       | 10dev.md           |       bin/ (shared scripts)
 +-----------------+       | state-files.md     |       +--------------------+
                           +--------------------+       | check-boundary.sh  |
                                                        | doc-health-audit.sh|
+                                                       | doc-drift-check.sh |
+                                                       | doc-toc-gen.sh     |
+                                                       | doc-soot-check.sh  |
                                                        | doc-sync.sh        |
                                                        +--------------------+
 
@@ -188,17 +195,17 @@ Global state (~/.10dev/):
   .onboarded              onboarding flag
 ```
 
-## DOCS Mode: Obsidian Integration
+## DOCS Mode: Automated Document Governance
 
-`/10docs` manages document health and cross-version memory via Obsidian:
+`/10docs` runs a full governance pipeline — updates stale docs, then cleans up structure:
 
-| Sub-Command | What It Does |
-|-------------|-------------|
-| `/10docs audit` | Detect stale tasks, untagged lessons, contract drift, orphaned docs |
-| `/10docs cleanup` | Phase-aware archival: snapshot completed work, start fresh |
+| Command | What It Does |
+|---------|-------------|
+| `/10docs` | **Full pipeline**: scan → update drift → organize → execute → verify |
+| `/10docs audit` | Report only — show what would change, no edits |
 | `/10docs sync` | Push state files to Obsidian vault with YAML frontmatter |
-| `/10docs snapshot` | Create versioned decision records (ADR) |
-| `/10docs index` | Rebuild phase-aware reading order |
+
+The pipeline auto-executes corrections (broken links, missing docs, stale refs) and presents structural changes (delete duplicates, generate TOCs, archive, extract) for one-click approval.
 
 ## Hook System
 
@@ -214,13 +221,13 @@ The optional boundary guard hook enforces Rule 1:
 
 ```text
 .
-+-- SKILL.md                  # Router layer (v2.4)
++-- SKILL.md                  # Router layer (v2.5)
 +-- docs/
 |   +-- 10plan.md             # PLAN mode (7 phases + WATCH LIST)
 |   +-- 10exec.md             # EXECUTE mode (stage loop + file drift detection)
 |   +-- 10review.md           # REVIEW mode (10-rule audit + profile match)
 |   +-- 10distill.md          # DISTILL mode (4 phases + 3-layer learning)
-|   +-- 10docs.md             # DOCS mode (Obsidian sync)
+|   +-- 10docs.md             # DOCS mode (automated governance pipeline)
 |   +-- 10dev.md              # /10dev orchestrator logic
 |   +-- state-files.md        # Canonical state file schemas
 +-- skills/
@@ -228,9 +235,14 @@ The optional boundary guard hook enforces Rule 1:
 |   +-- 10plan/ ... 10profile/  # Per-mode slash command wrappers
 +-- bin/
 |   +-- check-boundary.sh     # Rule 1 boundary guard
-|   +-- doc-health-audit.sh   # Document health check
+|   +-- detect-root.sh        # Project root detection (4 fallback strategies)
+|   +-- detect-env.sh         # Test/lint/type tool detection
+|   +-- doc-health-audit.sh   # Document health + governance metrics
+|   +-- doc-drift-check.sh    # Documentation drift from codebase
+|   +-- doc-toc-gen.sh        # TOC check and generation
+|   +-- doc-soot-check.sh     # Single source of truth checker
 |   +-- doc-sync.sh           # Obsidian vault sync engine
-+-- README.md / README.zh-CN.md / CONTRIBUTING.md / SECURITY.md
++-- CHANGELOG.md / README.md / README.zh-CN.md / CONTRIBUTING.md / SECURITY.md
 ```
 
 ## When To Use It

@@ -1,190 +1,179 @@
-# DOCS Mode — Document Health & Obsidian Sync
+# DOCS Mode — Automated Document Governance
 
-Manage document health, phase-aware cleanup, and Obsidian vault synchronization for cross-version memory.
+One command, one confirmation, full execution.
 
-## Sub-Commands
+Pipeline: **SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY**
 
-| Signal | Sub-Command |
-|--------|-------------|
-| `/10docs`, `/10docs audit`, "doc health", "what's stale" | **AUDIT** |
-| `/10docs cleanup`, "clean up docs", "archive phase" | **CLEANUP** |
-| `/10docs sync`, "sync to vault", "push to vault" | **SYNC** |
-| `/10docs snapshot`, "record decision" | **SNAPSHOT** |
-| `/10docs index`, "rebuild index" | **INDEX** |
+## Trigger
 
-Default (no sub-command): **AUDIT**.
+`/10docs` — runs the full pipeline (default).
+
+Variants:
+- `/10docs audit` — report only, no changes
+- `/10docs sync` — push to Obsidian vault only
 
 ---
 
-## First Run Setup
+## Pipeline Overview
 
-If `.10dev/doc-sync.yaml` does not exist, ask:
+| Phase | What | User involvement |
+|-------|------|-----------------|
+| SCAN | Run 4 detection scripts, collect raw data | None |
+| UPDATE | Fix broken pointers, document undocumented dirs, fix stale refs, create missing docs | **None — auto-executes** |
+| ORGANIZE | Classify: DELETE / TOC / ARCHIVE / EXTRACT | None |
+| PRESENT | Show consolidated report with all planned actions | **Single confirmation** |
+| EXECUTE | Apply all cleanup actions | None |
+| VERIFY | Re-run audit, show before→after | None |
 
-```
-Doc-sync needs a configuration. Choose setup:
-
-A) Default config (vault: ~/dev-vault, threshold: 7 days) — recommended
-B) Custom config — specify vault path and parameters
-C) Skip vault — only do project-local doc cleanup
-```
-
-Create `.10dev/doc-sync.yaml`:
-
-```yaml
-vault_root: ~/dev-vault
-project_name: auto
-staleness_threshold_days: 7
-auto_archive_on_phase_complete: false
-sync_on_mode_transition: true
-```
+Key distinction: **UPDATE runs without confirmation** (these are corrections to make docs match reality). **ORGANIZE actions need one confirmation** (these are preferences about structure).
 
 ---
 
-## AUDIT
+## Phase 1: SCAN
 
-Detect stale, conflicting, and orphaned documents.
+Run all scripts silently. Collect raw data.
 
-1. Run `bin/doc-health-audit.sh` from the project root.
-2. Present the health report:
+1. `bin/doc-health-audit.sh` — state files + governance metrics (CLAUDE.md lines, duplicates, TOC coverage, archive leaks)
+2. `bin/doc-drift-check.sh` — documentation drift from codebase:
+   - Broken pointers (links to non-existent files)
+   - Undocumented source directories
+   - Stale CLAUDE.md file references
+   - README version drift vs package.json
+   - Missing standard docs (e.g., ARCHITECTURE.md for large projects)
+   - Code directories changed recently without doc updates
+3. `bin/doc-soot-check.sh` — cross-file duplicate definitions
+4. `bin/doc-toc-gen.sh --check-only` — TOC status for every .md file
+
+---
+
+## Phase 2: UPDATE
+
+**Fix documentation drift BEFORE cleanup.** These are factual corrections — no confirmation needed.
+
+| Drift type | Detection | Fix |
+|-----------|-----------|-----|
+| Broken pointers | `broken_pointers[]` | Update link, remove dead link, or create missing target |
+| Undocumented dirs | `undocumented_dirs` | Add section to ARCHITECTURE.md or README.md |
+| Stale CLAUDE.md refs | `stale_claude_refs[]` | Update path or remove reference |
+| Version drift | `readme_version_drift` | Update README version to match package.json |
+| Missing docs | `missing_docs` | Create doc with content derived from codebase |
+| Stale docs | `stale_doc_dirs` | Read recent code changes, update relevant docs |
+
+The agent reads the actual code/files to generate correct documentation content — not placeholder text.
+
+---
+
+## Phase 3: ORGANIZE
+
+After UPDATE, docs are accurate. Now classify structural findings:
+
+### DELETE — Remove duplicate content
+
+For content in CLAUDE.md also in an L2 file:
+- Delete from CLAUDE.md, replace with `> See {file}`
+
+For SOOT duplicates across L2 files:
+- Keep in authority file, delete from others
+- Hierarchy: `docs/state-files.md` > `docs/{domain}.md` > `README.md` > `CLAUDE.md`
+
+### TOC — Add table of contents
+
+Files >200 lines without `## 目录`:
+- Generate via `bin/doc-toc-gen.sh` and insert after frontmatter
+
+### ARCHIVE — Move stale content
+
+- Sprint/one-time docs → `docs/archive/`
+- CLAUDE.md completed phase sections → compress to 1-line status
+- Stale completed tasks in todo.md → archive
+
+### EXTRACT — Split and index
+
+CLAUDE.md blocks that are NOT duplicated, NOT essential for AI context, AND >10 lines:
+- Create `docs/{topic}.md` with the content
+- Replace block with `> Details: [topic](docs/{topic}.md)`
+
+---
+
+## Phase 4: PRESENT
+
+Single consolidated report showing UPDATE results + ORGANIZE plan:
 
 ```
-DOC-SYNC: HEALTH AUDIT
-━━━━━━━━━━━━━━━━━━━━━━
-Project: {name} | Phase: {detected}
+/10docs — DOCUMENT GOVERNANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Project: {name} | CLAUDE.md: {N} lines (target: <100)
 
-todo.md:      {N} stale tasks (completed >{threshold}d ago)
-lessons.md:   {N} untagged entries / {N} total
-contract.md:  {N} drifted interfaces
-boundary.txt: {N} out-of-scope edits
-orphaned:     {list}
-━━━━━━━━━━━━━━━━━━━━━━
-Health: GREEN | YELLOW | RED
-Recommendation: {action}
-```
+UPDATED ({N} actions applied):
+  ✏️ {what was fixed}
 
-Health logic:
-- All zero -> **GREEN**
-- Stale tasks or untagged lessons -> **YELLOW**
-- Contract drift or boundary violations -> **RED**
+DELETE ({N} actions):
+  ✂ {what will be deleted}
 
----
+TOC ({N} files):
+  📑 {file} ({N} lines)
 
-## CLEANUP
+ARCHIVE ({N} items):
+  📦 {what will be archived}
 
-Phase-aware archival and document reorganization.
+EXTRACT ({N} blocks):
+  📤 {what will be extracted}
 
-1. Detect current phase from `todo.md` state:
-   - All unchecked -> PLAN
-   - Mix of checked/unchecked -> EXECUTE
-   - All checked -> REVIEW or DISTILL
-2. If phase transition detected, offer archive:
-
-```
-Phase "{PHASE}" appears complete. Archive?
-
-A) Archive — snapshot current docs, start fresh for next phase
-B) Not yet — still working in this phase
-C) Show me what would be archived first
-```
-
-3. On archive:
-   - Create `.10dev/archive/{PHASE}-{YYYY-MM-DD}/`
-   - Copy `todo.md`, `boundary.txt`, `contract.md`, `lessons.md` to archive
-   - Strip completed items from `todo.md`
-   - Append `## Phase Complete: {PHASE}` header in `lessons.md`
-4. Reorganize `lessons.md` entries under topic headers:
-   - Scoping (R1), Contracts (R2), Dependencies (R3), Staging (R4)
-   - Isolation (R5), Review (R6), Failure Paths (R7), Docs (R8)
-   - Verification (R9), Principles (R10)
-
----
-
-## SYNC
-
-Push project state to Obsidian vault with YAML frontmatter.
-
-1. Read `.10dev/doc-sync.yaml` for vault path and project name.
-2. Derive project name: `auto` uses `basename $(git rev-parse --show-toplevel)`.
-3. Run `bin/doc-sync.sh` which:
-   - Creates vault directory structure if needed:
-     ```
-     {vault}/projects/{project}/active/
-     {vault}/projects/{project}/archive/
-     {vault}/projects/{project}/decisions/
-     {vault}/projects/{project}/lessons/
-     ```
-   - For each state file, injects YAML frontmatter and writes to `active/`:
-     ```yaml
-     ---
-     title: "{file} — {project}"
-     status: active
-     tags: [{project}, {phase}, doc-sync, 10dev]
-     phase: {current phase}
-     synced: {ISO timestamp}
-     source: {relative path}
-     ---
-     ```
-   - Generates `_index.md` with phase-aware reading order.
-   - Updates `_health.md` with latest audit results.
-
----
-
-## SNAPSHOT
-
-Create a versioned decision record (ADR).
-
-1. Count existing files in `{vault}/projects/{project}/decisions/` for auto-numbering.
-2. Create `{NNN}-{slug}.md`:
-
-```markdown
----
-title: "ADR-{NNN}: {decision title}"
-status: accepted
-tags: [decision, {project}, {phase}]
-date: {ISO date}
----
-
-# ADR-{NNN}: {decision title}
-
-## Context
-{extracted from boundary.txt and contract.md}
-
-## Decision
-{what was decided}
-
-## Consequences
-{extracted from lessons.md entries near this date}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After: CLAUDE.md ≈ {N} lines | AI Friendliness: {score}/5
+Apply cleanup? [Y/n]
 ```
 
 ---
 
-## INDEX
+## Phase 5: EXECUTE
 
-Rebuild the vault reading order.
+On confirmation, apply in order:
+1. DELETE → remove duplicates, add pointers
+2. EXTRACT → split to new files, add index
+3. TOC → generate and insert
+4. ARCHIVE → git mv, compress
 
-1. Scan `{vault}/projects/{project}/` for all `.md` files.
-2. Generate `_index.md`:
-
-```markdown
----
-title: "{project} — Dev Memory Index"
-status: active
-tags: [index, {project}, doc-sync]
 ---
 
-# {project} — Reading Order
+## Phase 6: VERIFY
 
-> Phase: {current phase} | Last synced: {timestamp}
+Re-run `bin/doc-health-audit.sh`. Output before→after:
 
-## Active (read first)
-- [todo](active/todo.md) — current task state
-- [boundary](active/boundary.md) — scope lock
-- [contract](active/contract.md) — frozen interfaces
-- [lessons](active/lessons.md) — error prevention
-
-## Decisions (read on demand)
-{numbered list of ADRs, newest first}
-
-## Archive (history only)
-{grouped by phase-date, newest first}
 ```
+DONE: {N}/{M} actions
+Before → After:
+  CLAUDE.md: {N} → {N} lines
+  AI Friendliness: {N}/5 → {N}/5
+```
+
+---
+
+## AI Friendliness Score (0-5)
+
+1. CLAUDE.md < 100 lines
+2. 0 duplicate lines between L1 and L2
+3. All files >200 lines have TOC
+4. No archived content referenced in CLAUDE.md
+5. CLAUDE.md alone tells AI what to do next (agent judgment)
+
+---
+
+## Vault Sync (`/10docs sync`)
+
+Push project state to Obsidian vault:
+1. Read `.10dev/doc-sync.yaml` (auto-create with defaults if missing)
+2. `bin/doc-sync.sh sync` — inject YAML frontmatter, write to vault
+3. `bin/doc-sync.sh index` — regenerate reading order
+
+---
+
+## Design Principles
+
+1. **Update before organize** — docs must be accurate before restructuring
+2. **Corrections auto-execute** — broken links and stale refs are bugs, not preferences
+3. **One confirmation for cleanup** — DELETE/TOC/ARCHIVE/EXTRACT presented together
+4. **200-line TOC threshold** — files >200 lines get `## 目录`
+5. **Archive over delete** — non-essential content preserved in archive
+6. **Extract and index** — long blocks become standalone docs with pointer
+7. **Authority hierarchy** — `docs/state-files.md` > `docs/{domain}.md` > `README.md` > `CLAUDE.md`
