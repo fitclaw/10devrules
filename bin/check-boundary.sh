@@ -55,7 +55,13 @@ case "$FILE_PATH" in
   /*) ;;
   *) FILE_PATH="$(pwd)/$FILE_PATH" ;;
 esac
-FILE_PATH=$(realpath -m "$FILE_PATH" 2>/dev/null || printf '%s' "$FILE_PATH" | sed 's|/\+|/|g;s|/$||')
+# Portable canonicalization: python3 posixpath > realpath -m > sed fallback
+_canonicalize() {
+  python3 -c "import os.path; print(os.path.normpath('$1'))" 2>/dev/null \
+    || realpath -m "$1" 2>/dev/null \
+    || printf '%s' "$1" | sed 's|/\+|/|g;s|/$||'
+}
+FILE_PATH=$(_canonicalize "$FILE_PATH")
 
 # Always allow writes to .10dev/ state files (boundary.txt, contract.md, etc.)
 case "$FILE_PATH" in
@@ -69,7 +75,7 @@ for allowed in "${ALLOWED_PATHS[@]}"; do
     /*) ;;
     *) allowed="$(pwd)/$allowed" ;;
   esac
-  allowed=$(realpath -m "$allowed" 2>/dev/null || printf '%s' "$allowed" | sed 's|/\+|/|g;s|/$||')
+  allowed=$(_canonicalize "$allowed")
 
   # Ensure match requires directory boundary (append / for comparison)
   # This prevents /src matching /src-old

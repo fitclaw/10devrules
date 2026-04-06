@@ -73,7 +73,7 @@ if [ -f .10dev/boundary.txt ]; then
   while IFS= read -r recent_file; do
     IN_SCOPE=false
     while IFS= read -r allowed; do
-      allowed=$(printf '%s' "$allowed" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      allowed=$(printf '%s' "$allowed" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s|/$||')
       [ -z "$allowed" ] && continue
       [[ "$allowed" == \#* ]] && continue
       if [ "$recent_file" = "$allowed" ] || case "$recent_file" in "${allowed}/"*) true;; *) false;; esac; then
@@ -83,7 +83,7 @@ if [ -f .10dev/boundary.txt ]; then
     if [ "$IN_SCOPE" = false ]; then
       BOUNDARY_VIOLATIONS=$((BOUNDARY_VIOLATIONS + 1))
     fi
-  done < <(find . -name '*.md' -o -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.go' | grep -v node_modules | grep -v .git | grep -v .10dev)
+  done < <(find . -name '*.md' -o -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.go' | grep -v node_modules | grep -v .git | grep -v .10dev | sed 's|^\./||')
 fi
 
 # --- orphaned docs: .md files not in todo.md or any index ---

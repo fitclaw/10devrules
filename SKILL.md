@@ -1,7 +1,7 @@
 ---
 name: ten-dev-rules
 preamble-tier: 2
-version: 2.5.0
+version: 2.5.1
 description: |
   Agent-driven development workflow using 10 rules as active decision gates.
   Five work modes: PLAN, EXECUTE (env-aware + auto code review), REVIEW (self-check gate + deep review), DISTILL, DOCS.
@@ -39,7 +39,7 @@ hooks:
           statusMessage: "Rule 1: Checking scope boundary..."
 ---
 
-# Ten Development Rules — Agent Skill v2.5.0
+# Ten Development Rules — Agent Skill v2.5.1
 
 An active agent cluster that uses 10 rules as decision gates. Each mode's detailed logic lives in `docs/` — read on demand.
 

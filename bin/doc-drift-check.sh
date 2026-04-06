@@ -21,6 +21,7 @@ for md in *.md docs/*.md; do
   grep -oE '\]\([^)]+\)' "$md" 2>/dev/null \
     | sed 's/^\](//' | sed 's/)$//' \
     | grep -vE '^(https?://|mailto:|#)' \
+    | grep -vF '{' \
     | sed 's/#.*//' \
     | while IFS= read -r path; do
         [ -z "$path" ] && continue
@@ -112,7 +113,13 @@ if [ -d src ] || [ -d app ]; then
     [ -f "$f" ] && has_arch=true && break
   done
   if [ "$has_arch" = false ]; then
-    file_count=$(find ${src:+src} ${app:+app} -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.go' 2>/dev/null | wc -l | tr -d '[:space:]')
+    _find_dirs=""
+    [ -d src ] && _find_dirs="$_find_dirs src"
+    [ -d app ] && _find_dirs="$_find_dirs app"
+    file_count=0
+    if [ -n "$_find_dirs" ]; then
+      file_count=$(find $_find_dirs -name '*.ts' -o -name '*.js' -o -name '*.py' -o -name '*.go' 2>/dev/null | wc -l | tr -d '[:space:]')
+    fi
     if [ "${file_count:-0}" -gt 10 ]; then
       MISSING_DOCS="${MISSING_DOCS}${MISSING_DOCS:+, }ARCHITECTURE.md (${file_count}+ source files)"
       MISSING_COUNT=$((MISSING_COUNT + 1))

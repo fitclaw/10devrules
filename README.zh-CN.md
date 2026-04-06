@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.md)
-[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.5.1-blue.svg)](./SKILL.md)
 
 [English](./README.md) | 简体中文
 
@@ -124,7 +124,9 @@ L2: 通用原则 (universal-principles) -> 抽象的、与项目无关的
 
 ## v2.5 新特性
 
-**自动化文档治理 (/10docs)**。完全重写为单命令管道：SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY。UPDATE 阶段在清理之前自动修复断链、补充未文档化目录、更新过期引用。结构性变更（删重复、生成目录、归档、拆分）一次确认全部执行。
+**v2.5.1: Bug 修复。** macOS 上边界守卫 `..` 遍历绕过漏洞修复（可移植规范化）。`/10docs` 在有 `src/`/`app/` 的项目上崩溃修复。boundary violation 误报和模板占位符误报断链修复。
+
+**v2.5.0: 自动化文档治理 (/10docs)**。完全重写为单命令管道：SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY。UPDATE 阶段在清理之前自动修复断链、补充未文档化目录、更新过期引用。结构性变更（删重复、生成目录、归档、拆分）一次确认全部执行。
 
 **文档漂移检测**。新脚本 `bin/doc-drift-check.sh` 检测断链、未文档化的源码目录、CLAUDE.md 过期路径引用、README 版本漂移、缺失的标准文档、以及代码改了但文档没跟上的情况。
 

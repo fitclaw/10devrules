@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.5.1 — Bug Fixes
+
+Four bugs found via `/10review` deep code review, all confirmed and fixed:
+
+- **[P1] Boundary guard bypassed on macOS** — `realpath -m` is not available on macOS. Fallback only cleaned duplicate slashes, not `..` traversal. Paths like `src/../secrets/key.txt` passed the check. Fix: portable 3-tier canonicalization (`python3 os.path.normpath` > `realpath -m` > `sed`).
+- **[P1] `/10docs` crashed on projects with `src/` or `app/`** — `doc-drift-check.sh` used shell parameter expansion `${src:+src}` instead of literal directory names, causing `find` to error on macOS. Fix: explicit `[ -d src ] && dirs="src"` guard.
+- **[P2] Boundary violation false positives** — `find .` outputs `./src/main.ts` but boundary has `src/`, prefix never matched. Also, trailing `/` in boundary caused double-slash `src//`. Fix: strip `./` from find output, strip trailing `/` from allowed paths.
+- **[P2] Template placeholders reported as broken links** — `doc-drift-check.sh` treated `docs/{topic}.md` in documentation examples as real file paths. Fix: filter out links containing `{`.
+
+---
+
 ## v2.5.0 — Automated Document Governance
 
 `/10docs` rewritten as a fully automated pipeline. One command, one confirmation, full execution.

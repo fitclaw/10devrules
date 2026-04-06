@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Docs](https://img.shields.io/badge/Docs-English%20%26%20%E4%B8%AD%E6%96%87-blue.svg)](./README.zh-CN.md)
-[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](./SKILL.md)
+[![Version](https://img.shields.io/badge/version-2.5.1-blue.svg)](./SKILL.md)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -137,7 +137,9 @@ Features:
 
 ## What's New in v2.5
 
-**Automated document governance (/10docs).** Completely rewritten as a single-command pipeline: SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY. The UPDATE phase auto-fixes broken links, documents undocumented directories, and updates stale references *before* cleanup begins. One confirmation applies all structural changes.
+**v2.5.1: Bug fixes.** Boundary guard `..` traversal bypass on macOS fixed with portable canonicalization. `/10docs` crash on `src/`/`app/` projects fixed. Boundary violation false positives and template placeholder false broken-link reports resolved.
+
+**v2.5.0: Automated document governance (/10docs).** Completely rewritten as a single-command pipeline: SCAN → UPDATE → ORGANIZE → EXECUTE → VERIFY. The UPDATE phase auto-fixes broken links, documents undocumented directories, and updates stale references *before* cleanup begins. One confirmation applies all structural changes.
 
 **Documentation drift detection.** New `bin/doc-drift-check.sh` finds broken pointers, undocumented source directories, stale CLAUDE.md references, README version drift, missing standard docs, and code that changed without doc updates.
 
